@@ -1,0 +1,232 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+
+body {
+    background-attachment: fixed;
+    background-color: #1a1917;
+    background-image: url(../img/body_bg.png);
+    background-position: top left;
+    background-repeat: no-repeat;
+
+    font-family: Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+    --opacity-black-color: rgba(0, 0, 0, 0.6);
+    --opacity-white-color: rgba(245, 245, 245, 0.8);
+    --white-text-color: white;
+
+    color: var(--white-text-color);
+    overflow: hidden;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: var(--opacity-white-color);
+    cursor: pointer;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(245, 245, 245, 1);
+}
+
+.hover-effect-zoom,
+.hover-effect-leap-right {
+    transition: transform .3s ease;
+    cursor: pointer;
+}
+
+.hover-effect-zoom:hover {
+    transform: scale(1.2);
+}
+
+.hover-effect-leap-right:hover {
+    transform: translate(1rem, 0);
+}
+
+.color-inverted {
+    filter: invert(1);
+}
+
+.invisible {
+    opacity: 0;
+}
+
+.display-flex {
+    display: flex;
+}
+
+.header {
+    background-color: var(--opacity-black-color);
+    position: absolute;
+    display: flex;
+    top: 1vh;
+    left: 1vh;
+    width: calc(100% - 2vh);
+    height: 8vh;
+    align-items: center;
+    padding: 2rem;
+}
+
+.icon {
+    height: 100%;
+}
+
+.icon img {
+    height: 100%;
+}
+
+.header-menu {
+    flex: 1;
+    display: flex;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    justify-content: center;
+}
+
+.header-menu .menu-item {
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+}
+
+.header-menu .menu-item img {
+    height: 19px;
+    padding-right: 0.5rem;
+}
+
+.header-menu-items {
+    display: flex;
+    width: 100%;
+    max-width: 500px;
+    justify-content: space-around;
+}
+
+.header-user-box,
+.header-user-box .user-icon,
+.header-user-box .search-icon {
+    height: 100%;
+}
+
+.header-user-box {
+    display: flex;
+    align-items: center;
+    min-width: 200px;
+    justify-content: space-around;
+}
+
+.header-user-box>div {
+    margin: 0.5rem;
+}
+
+.header-user-box .notification {
+    display: flex;
+    background-color: var(--opacity-white-color);
+    border-radius: 100%;
+}
+
+.header-user-box .all-apps {
+    display: flex;
+}
+
+.header-user-box .notification>svg {
+    margin: 0.5rem;
+    color: black;
+}
+
+.header-user-box .all-apps>svg,
+.header-user-box .notification>svg {
+    height: 25px;
+    width: 25px;
+}
+
+.header-user-box .user-icon,
+.header-user-box .search-icon {
+    background-color: var(--opacity-white-color);
+    border-radius: 100%;
+}
+
+.header-user-box .user-icon img {
+    height: 100%;
+    padding: 0.3rem;
+}
+
+.header-user-box .search-icon img {
+    height: 100%;
+    padding: 0.5rem;
+}
+
+.navigation-bar {
+    position: absolute;
+    display: flex;
+    top: 10vh;
+    width: 20vw;
+    height: calc(100vh - 11vh);
+    background-color: var(--opacity-black-color);
+    flex-direction: column;
+    padding-top: 1rem;
+}
+
+.navigation-bar-left {
+    left: 1vh;
+}
+
+.navigation-bar .menu-item {
+    display: flex;
+    padding: 1rem 2rem 0 2rem;
+    flex-direction: column;
+}
+
+.navigation-bar .menu-item div {
+    display: flex;
+}
+
+.navigation-bar .menu-item .menu-item-header {
+    align-items: center;
+}
+
+.navigation-bar .menu-item .menu-item-children {
+    margin-top: 1rem;
+    margin-left: 2.5rem;
+    flex-direction: column;
+}
+
+.navigation-bar .menu-item img {
+    height: 19px;
+    padding-right: 0.5rem;
+}
+
+.open-close-icon {
+    display: flex;
+    padding-right: 0.5rem;
+    height: 12px;
+    cursor: pointer;
+    transition: transform .3s ease;
+    margin-top: -2px;
+}
+
+.open-close-icon.open {
+    transform: rotate(90deg);
+    margin-top: 4px;
+}
+
+
+.open-close-icon svg {
+    color: var(--opacity-white-color);
+}
+
+.content {
+    position: absolute;
+    display: flex;
+    top: 10vh;
+    left: calc(20vw + 2vh);
+    width: calc(100vw - calc(20vw + 3vh));
+    height: calc(100vh - 11vh);
+    background-color: var(--opacity-black-color);
+    overflow: auto;
+}
