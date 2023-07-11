@@ -36,24 +36,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
         selectable: true,
         selectMirror: true,
+        buttonText: {
+            today: 'Aktueller Plan',
+        },
+        buttonHints: {
+            today: 'Aktueller Plan',
+            prev: "Vorheriger Plan",
+            next: "Nächster Plan",
+        },
 
         // Create new event
         select: function (arg) {
             addShift(arg);
-        },
-
-        events: [
-            {
-              id: 'a',
-              title: 'my event',
-              start: '2023-10-06'
-            }
-          ]
+        }
     })
     calendar.render()
 });
 
 function addShift(addEvent){
+console.log(new Date(addEvent.startStr));
+
+    calendar.unselect()
     calendar.addEvent({
         title: "Test",
         start: addEvent.startStr,
