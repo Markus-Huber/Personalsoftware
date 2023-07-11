@@ -57,12 +57,10 @@ function addShift(addEvent){
 console.log(new Date(addEvent.startStr));
 
     calendar.unselect()
-    calendar.addEvent({
+    /*calendar.addEvent({
         title: "Test",
         start: addEvent.startStr,
         end: addEvent.endStr,
         allDay: false
-    })
-
-    console.warn(addEvent);
+    })*/
 }
