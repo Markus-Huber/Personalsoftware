@@ -1,0 +1,22 @@
+.fc-timegrid-slot.fc-timegrid-slot-label.fc-timegrid-slot-minor,
+.fc-timegrid-slot.fc-timegrid-slot-lane.fc-timegrid-slot-minor {
+    border-color: rgba(255, 255, 255, .4);
+}
+
+.fc-timegrid-slot.fc-timegrid-slot-label.fc-scrollgrid-shrink {
+    height: 2.5rem;
+}
+
+.fc-timegrid-col-frame .fc-timegrid-col-events {
+    padding-right: 10rem;
+    margin-right: 10rem;
+}
+
+.fc-timegrid-event-harness {
+    max-width: 85%;
+}
+
+.fc-button-primary {
+    background-color: var(--opacity-white-color) !important;
+    color: black !important;
+}

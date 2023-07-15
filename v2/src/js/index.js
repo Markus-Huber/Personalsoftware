@@ -1,4 +1,4 @@
-let calendar; 
+let calendar;
 
 document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('schichtplan-creator')
@@ -50,11 +50,25 @@ document.addEventListener('DOMContentLoaded', function () {
             addShift(arg);
         }
     })
-    calendar.render()
+    calendar.render();
+
+    let parent = document.getElementById("schicht-dropdown");
+
+    var dropdown = new Dropdown({
+        data: {
+            1: "test",
+            2: "bla",
+            3: "Lorum",
+            4: "Ipsum"
+        },
+        placeholder: "z.B. Frau"
+    }).metaName("gender").setValue();
+
+    parent.appendChild(dropdown.build());
 });
 
-function addShift(addEvent){
-console.log(new Date(addEvent.startStr));
+function addShift(addEvent) {
+    console.log(new Date(addEvent.startStr));
 
     calendar.unselect()
     /*calendar.addEvent({

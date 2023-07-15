@@ -289,31 +289,31 @@ menu-item-header .open-close-icon {
     background-color: #cdcdcd;
     position: fixed;
     z-index: 100;
-    animation-name: popup;
+    /*animation-name: popup;*/
     animation-duration: .5s;
     animation-timing-function: ease-in-out;
     animation-fill-mode: forwards;
+    top: calc(10vh + 5rem);
+    left: calc(20vw + 2vh + 2rem);
+    height: calc(100vh - 11vh - 7rem);
+    width: calc(100vw - calc(20vw + 3vh) - 4rem);
 }
 
-.fc-timegrid-slot.fc-timegrid-slot-label.fc-timegrid-slot-minor,
-.fc-timegrid-slot.fc-timegrid-slot-lane.fc-timegrid-slot-minor {
-    border-color: rgba(255, 255, 255, .4);
+.popup {
+    padding: 1rem 2rem 0 2rem;
 }
 
-.fc-timegrid-slot.fc-timegrid-slot-label.fc-scrollgrid-shrink {
-    height: 2.5rem;
+.popup h2 {
+    color: black;
+    margin-top: 0;
+    font-size: 1.75em;
 }
 
-.fc-timegrid-col-frame .fc-timegrid-col-events {
-    padding-right: 10rem;
-    margin-right: 10rem;
-}
-
-.fc-timegrid-event-harness {
-    max-width: 85%;
-}
-
-.fc-button-primary {
-    background-color: var(--opacity-white-color) !important;
-    color: black !important;
+.defaultPopupTable {
+    white-space: nowrap;
+    font-size: 20px;
+    background-color: var(--backgroundWhite);
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0cm;
 }
