@@ -1,8 +1,11 @@
 let calendar;
 let weekDays = [];
 let startDayOfShift = 4;
+let content;
 
 document.addEventListener('DOMContentLoaded', function () {
+    content = document.getElementsByClassName("content")[0];
+
     const calendarEl = document.getElementById('schichtplan-creator')
     calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'timeGridWeek',

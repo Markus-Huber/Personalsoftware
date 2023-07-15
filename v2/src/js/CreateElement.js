@@ -292,71 +292,78 @@ class ElementBuilder {
                 }
                 this.m_ChildElement.onblur = (event) => {
                     let value = this.m_ChildElement.value;
-                    if(isEmpty(value)){
+                    if (isEmpty(value)) {
                         return;
                     }
 
                     let regex = new RegExp(/^([01]\d|2[0-3]):([0-5]\d)$/);
-                    if(regex.test(value)){
+                    if (regex.test(value)) {
                         return;
                     }
-                    if(value.length > 4){
+
+                    // trying to fix it
+                    if (value.length > 4) {
                         let howMuch = value.indexOf(":") != -1 ? 5 : 4;
                         value = value.substring(0, howMuch);
                     }
-                    if(value.split(":").join("").length == 4){
+                    if (value.split(":").join("").length == 4) {
                         value = value.split(":").join("");
                         value = value.substring(0, 2) + ":" + value.substring(2);
                     }
-                    // trying to fix it
 
-                    if(!regex.test(value)){
-                        if(value.indexOf(":") == -1){
-                            if(value.length == 2){
+                    if (!regex.test(value)) {
+                        if (value.indexOf(":") == -1) {
+                            if (value.length == 2) {
                                 value = value + ":00";
-                            }else{
-                                value = value.substring(0,2) + ":" + value.substring(2);
+                            } else {
+                                value = value.substring(0, 2) + ":" + value.substring(2);
                             }
                         }
 
                         let parts = value.split(":");
-                        console.log(parts);
-                        if(parts[1] > 59){
+                        if (parts[1] > 59) {
                             parts[0] = (new Number(parts[0]) + 1) + "";
-                            if(parts[0].length == 1){
+                            if (parts[0].length == 1) {
                                 parts[0] = "0" + parts[0];
                             }
                             parts[1] = (new Number(parts[1]) - 60) + "";
-                            if(parts[1].length == 1){
+                            if (parts[1].length == 1) {
                                 parts[1] = "0" + parts[1];
                             }
                         }
-                        if(parts[0] > 24){
+                        if (parts[0] > 24) {
                             parts[0] = "00";
                         }
-                        if(parts[0].length == 0){
+                        if (parts[0].length == 0) {
                             parts[0] = "00";
                         }
-                        if(parts[1].length == 0){
+                        if (parts[1].length == 0) {
                             parts[1] = "00";
                         }
 
-                        if(parts[0].length == 1){
+                        if (parts[0].length == 1) {
                             parts[0] = "0" + parts[0];
                         }
-                        if(parts[1].length == 1){
+                        if (parts[1].length == 1) {
                             parts[1] = parts[1] + "0";
                         }
-    
-                        value = parts.join(":");    
+
+                        value = parts.join(":");
                     }
-                    if(regex.test(value)){
-                        this.m_ChildElement.value = value;
-                    }else{
-                        this.m_ChildElement.value = "00:00";    
+
+                    let isRepairable = regex.test(value);
+                    if (!isRepairable) {
+                        value = "00:00";
                     }
+
+                    showAlert("warning", "Der eingegebene Wert [" + this.m_ChildElement.value + "] ist ungültig.<br>" +
+                        "Korrigierten Wert " + value + " übernehmen?", () => {
+                            this.m_ChildElement.value = value;
+                        }, () => {
+                            this.m_ChildElement.focus();
+                        });
                 }
-                
+
             } else {
                 this.m_ChildElement.setAttribute(_property, isEmpty(_value) ? "" : _value);
             }
@@ -410,6 +417,43 @@ class ElementBuilder {
         }
         return this.m_ChildElement;
     }
+}
+
+function showAlert(type, message, okCallback, abortCallback) {
+    for (let i = 0; i < document.getElementsByClassName("alert").length; i++) {
+        document.getElementsByClassName("alert")[0].parentElement.removeChild(document.getElementsByClassName("alert")[0]);
+    }
+
+    let popup = new ElementBuilder("div").cssClass("alert").parent(content);
+    let popupContent = new ElementBuilder("div").cssClass("content-wrapper").parent(popup);
+    let image = new ElementBuilder("img").cssClass("type");
+    if (type == "warning") {
+        image.attribute("src", "src/img/icon/warning.PNG");
+    }
+    popupContent.children(image, new ElementBuilder("div").cssClass("message-wrapper").children(
+        new ElementBuilder("div").cssClass("message").children(message)
+    ));
+    popupContent.build();
+
+    popup.children(new ElementBuilder("div").cssClass("buttons").children(
+        new ElementBuilder("button").children("Akzeptieren").onclick(() => {
+            if(okCallback){
+                okCallback();
+                for (let i = 0; i < document.getElementsByClassName("alert").length; i++) {
+                    document.getElementsByClassName("alert")[0].parentElement.removeChild(document.getElementsByClassName("alert")[0]);
+                }
+            }
+        }),
+        new ElementBuilder("button").children("Abbrechen").onclick(() => {
+            if(abortCallback){
+                abortCallback();
+                for (let i = 0; i < document.getElementsByClassName("alert").length; i++) {
+                    document.getElementsByClassName("alert")[0].parentElement.removeChild(document.getElementsByClassName("alert")[0]);
+                }
+            }
+        }),
+    ), );
+    popup.build();
 }
 
 /**
