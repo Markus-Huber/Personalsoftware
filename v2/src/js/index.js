@@ -1,4 +1,6 @@
 let calendar;
+let weekDays = [];
+let startDayOfShift = 4;
 
 document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('schichtplan-creator')
@@ -19,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
             left: "",
         },
         locale: 'de',
-        firstDay: 4,
+        firstDay: startDayOfShift,
         allDaySlot: false,
         businessHours: {
             daysOfWeek: [1, 2, 3, 4, 5, 6, 0],
@@ -52,20 +54,54 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     calendar.render();
 
-    let parent = document.getElementById("schicht-dropdown");
+    let date = new Date('2022/08/22');
+    for (let i = 0; i <= 6; i++) {
+        weekDays.push(date.toLocaleDateString("de-DE", {
+            weekday: 'long'
+        }));
+        date.setDate(date.getDate() + 1);
+    }
+    weekDays = weekDays.slice(startDayOfShift - 1).concat(weekDays.slice(0, startDayOfShift - 1));
+
+    createShiftTable();
+});
+
+function createShiftTable() {
+    let parent = document.getElementById("schichtplan-neue-schicht");
 
     var dropdown = new Dropdown({
-        data: {
-            1: "test",
-            2: "bla",
-            3: "Lorum",
-            4: "Ipsum"
-        },
-        placeholder: "z.B. Frau"
+        data: Object.assign({}, weekDays),
+        placeholder: "z.B. " + weekDays[0]
     }).metaName("gender").setValue();
 
-    parent.appendChild(dropdown.build());
-});
+
+    let parentTable = new ElementBuilder("table").cssClass("popup-table");
+
+    new ElementBuilder("tr").children(
+        new ElementBuilder("td").children(
+            new ElementBuilder("table").children(
+                new ElementBuilder("tr").children(
+                    new ElementBuilder("td").children(
+                        "Wochentag"
+                    ).cssClass("popup-table-caption"),
+                    new ElementBuilder("td").children(
+                        dropdown.build()
+                    )
+                ),
+                new ElementBuilder("tr").children(
+                    new ElementBuilder("td").children(
+                        "Beginn"
+                    ).cssClass("popup-table-caption"),
+                    new ElementBuilder("td").children(
+                        new ElementBuilder("input").attribute("type", "time").attribute("placeholder", "z.B. 08:00 Uhr")
+                    )
+                )
+            )
+        )
+    ).parent(parentTable).build();
+
+    parent.appendChild(parentTable.build());
+}
 
 function addShift(addEvent) {
     console.log(new Date(addEvent.startStr));

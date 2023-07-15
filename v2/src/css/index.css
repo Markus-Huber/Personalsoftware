@@ -4,6 +4,9 @@
     box-sizing: border-box;
 }
 
+* {
+    font-size: 16px;
+}
 
 body {
     background-attachment: fixed;
@@ -20,6 +23,10 @@ body {
 
     color: var(--white-text-color);
     overflow: hidden;
+}
+
+body:has(.alert) .content {
+    overflow: visible;
 }
 
 ::-webkit-scrollbar {
@@ -289,10 +296,12 @@ menu-item-header .open-close-icon {
     background-color: #cdcdcd;
     position: fixed;
     z-index: 100;
+
     /*animation-name: popup;*/
     animation-duration: .5s;
     animation-timing-function: ease-in-out;
     animation-fill-mode: forwards;
+
     top: calc(10vh + 5rem);
     left: calc(20vw + 2vh + 2rem);
     height: calc(100vh - 11vh - 7rem);
@@ -301,6 +310,7 @@ menu-item-header .open-close-icon {
 
 .popup {
     padding: 1rem 2rem 0 2rem;
+    color: black;
 }
 
 .popup h2 {
@@ -309,11 +319,74 @@ menu-item-header .open-close-icon {
     font-size: 1.75em;
 }
 
-.defaultPopupTable {
-    white-space: nowrap;
-    font-size: 20px;
-    background-color: var(--backgroundWhite);
+.popup input {
+    float: left;
     width: 100%;
-    border-collapse: collapse;
-    border-spacing: 0cm;
+    border: solid 1px rgba(0, 0, 0, 0);
+    outline: none;
+    padding: .5rem;
+}
+
+.popup input:focus {
+    border-radius: 2px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    outline: 1.4px solid var(--opacity-black-color);
+}
+
+.popup .popup-table,
+.popup .popup-table tr {
+    width: 100%;
+    display: flex;
+}
+
+.popup .popup-table tr td {
+    width: 75%;
+}
+
+.popup .popup-table>tr>td>table {
+    width: calc(100% - 2rem);
+    max-width: 60%;
+}
+
+.popup .popup-table tr .popup-table-caption {
+    align-items: center;
+    display: flex;
+    width: 25%;
+}
+
+.alert {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+
+    background-color: var(--opacity-white-color);
+    z-index: 200;
+    box-shadow: 0 0px 0px 100vh rgba(0, 0, 0, 0.7);
+    transition: all .3s ease;
+
+    /* animation-name: alert; */
+    animation-duration: .5s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+
+    min-height: 10vh;
+    min-width: 20vw;
+}
+
+@keyframes alert {
+    from {
+        opacity: 0;
+        overflow: hidden;
+        min-height: 0vh;
+        min-width: 0vw;
+    }
+
+    to {
+        opacity: 1;
+        overflow: visible;
+        min-height: 10vh;
+        min-width: 20vw;
+    }
 }

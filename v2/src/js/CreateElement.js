@@ -202,7 +202,7 @@ class ElementBuilder {
      */
     icon(_icon) {
         if (!isEmpty(_icon)) {
-            this.m_ChildElement.style.backgroundImage = "url('./VAADIN/themes/" + _icon + "')";
+            this.m_ChildElement.style.backgroundImage = "url('./src/image/" + _icon + "')";
         }
         return this;
     }
@@ -278,6 +278,85 @@ class ElementBuilder {
                 this._applyAfterAttach = function () {
                     datepicker.render();
                 }
+            } else if (_property == "type" && _value == "time" && this.m_HtmlElement == "input") {
+                this.m_ChildElement.onkeydown = (event) => {
+                    if (event.altKey || event.ctrlKey || event.metaKey ||
+                        event.code == "ArrowLeft" || event.code == "ArrowRight" || event.code == "ArrowUp" || event.code == "ArrowDown" ||
+                        event.code == "Backspace" || event.code == "Delete" || event.code == "Home" || event.code == "End") {
+                        return;
+                    }
+                    let newValue = this.m_ChildElement.value + event.key;
+                    if (!(/^[0-9:]+$/.test(newValue)) || newValue.split(":").length > 2) {
+                        event.preventDefault();
+                    }
+                }
+                this.m_ChildElement.onblur = (event) => {
+                    let value = this.m_ChildElement.value;
+                    if(isEmpty(value)){
+                        return;
+                    }
+
+                    let regex = new RegExp(/^([01]\d|2[0-3]):([0-5]\d)$/);
+                    if(regex.test(value)){
+                        return;
+                    }
+                    if(value.length > 4){
+                        let howMuch = value.indexOf(":") != -1 ? 5 : 4;
+                        value = value.substring(0, howMuch);
+                    }
+                    if(value.split(":").join("").length == 4){
+                        value = value.split(":").join("");
+                        value = value.substring(0, 2) + ":" + value.substring(2);
+                    }
+                    // trying to fix it
+
+                    if(!regex.test(value)){
+                        if(value.indexOf(":") == -1){
+                            if(value.length == 2){
+                                value = value + ":00";
+                            }else{
+                                value = value.substring(0,2) + ":" + value.substring(2);
+                            }
+                        }
+
+                        let parts = value.split(":");
+                        console.log(parts);
+                        if(parts[1] > 59){
+                            parts[0] = (new Number(parts[0]) + 1) + "";
+                            if(parts[0].length == 1){
+                                parts[0] = "0" + parts[0];
+                            }
+                            parts[1] = (new Number(parts[1]) - 60) + "";
+                            if(parts[1].length == 1){
+                                parts[1] = "0" + parts[1];
+                            }
+                        }
+                        if(parts[0] > 24){
+                            parts[0] = "00";
+                        }
+                        if(parts[0].length == 0){
+                            parts[0] = "00";
+                        }
+                        if(parts[1].length == 0){
+                            parts[1] = "00";
+                        }
+
+                        if(parts[0].length == 1){
+                            parts[0] = "0" + parts[0];
+                        }
+                        if(parts[1].length == 1){
+                            parts[1] = parts[1] + "0";
+                        }
+    
+                        value = parts.join(":");    
+                    }
+                    if(regex.test(value)){
+                        this.m_ChildElement.value = value;
+                    }else{
+                        this.m_ChildElement.value = "00:00";    
+                    }
+                }
+                
             } else {
                 this.m_ChildElement.setAttribute(_property, isEmpty(_value) ? "" : _value);
             }
