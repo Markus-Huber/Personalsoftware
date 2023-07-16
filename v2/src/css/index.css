@@ -15,7 +15,7 @@ body {
     background-position: top left;
     background-repeat: no-repeat;
 
-    font-family: Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+    font-family: Arial, Helvetica, sans-serif;
     --opacity-black-color: rgba(0, 0, 0, 0.6);
     --opacity-white-color: rgba(245, 245, 245, 0.8);
     --white-text-color: white;
@@ -310,11 +310,11 @@ menu-item-header .open-close-icon {
 
 .popup {
     padding: 1rem 2rem 0 2rem;
-    color: black;
+    color: var(--opacity-black-color);
 }
 
 .popup h2 {
-    color: black;
+    color: var(--opacity-black-color);
     margin-top: 0;
     font-size: 1.75em;
 }
@@ -353,7 +353,14 @@ menu-item-header .open-close-icon {
 .popup .popup-table tr .popup-table-caption {
     align-items: center;
     display: flex;
-    width: 25%;
+}
+
+.popup .popup-header{
+    display: flex;
+}
+
+.popup .popup-header h2:first-child{
+    flex: 1;
 }
 
 .alert {
@@ -374,7 +381,7 @@ menu-item-header .open-close-icon {
     animation-fill-mode: forwards;
 
     min-width: 20vw;
-    color: black;
+    color: var(--opacity-black-color);
     flex-direction: column;
 }
 

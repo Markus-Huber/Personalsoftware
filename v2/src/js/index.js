@@ -2,6 +2,7 @@ let calendar;
 let weekDays = [];
 let startDayOfShift = 4;
 let content;
+let defaultShifts = [];
 
 document.addEventListener('DOMContentLoaded', function () {
     content = document.getElementsByClassName("content")[0];
@@ -66,16 +67,33 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     weekDays = weekDays.slice(startDayOfShift - 1).concat(weekDays.slice(0, startDayOfShift - 1));
 
-    createShiftTable();
+    addShiftPopup();
 });
 
-function createShiftTable() {
-    let parent = document.getElementById("schichtplan-neue-schicht");
+function addShiftPopup() {
+    let parent = new ElementBuilder("div").attribute("id", "schichtplan-neue-schicht").parent(content).cssClass("popup").build();
 
-    var dropdown = new Dropdown({
+    new ElementBuilder("div").cssClass("popup-header").children(
+        new ElementBuilder("h2").children("Schicht planen"),
+        new ElementBuilder("h2").children("✖").cssClass("hover-effect-zoom").onclick(() => {
+            parent.parentElement.removeChild(parent);
+        }),
+    ).parent(parent).build();
+
+    let wochentagDropdown = new Dropdown({
         data: Object.assign({}, weekDays),
         placeholder: "z.B. " + weekDays[0]
-    }).metaName("gender").setValue();
+    }).metaName("wochentag").setValue();
+
+    let mitarbeiterDropdown = new Dropdown({
+        data: Object.assign({}, weekDays),
+        placeholder: "z.B. Max Mustermann"
+    }).metaName("mitarbeiter").setValue();
+
+    let cmDropdown = new Dropdown({
+        data: Object.assign({}, weekDays),
+        placeholder: "z.B. Kasse 1"
+    }).metaName("cm").setValue();
 
 
     let parentTable = new ElementBuilder("table").cssClass("popup-table");
@@ -88,12 +106,12 @@ function createShiftTable() {
                         "Wochentag"
                     ).cssClass("popup-table-caption"),
                     new ElementBuilder("td").children(
-                        dropdown.build()
+                        wochentagDropdown.build()
                     )
                 ),
                 new ElementBuilder("tr").children(
                     new ElementBuilder("td").children(
-                        "Beginn"
+                        "Anfang"
                     ).cssClass("popup-table-caption"),
                     new ElementBuilder("td").children(
                         new ElementBuilder("input").attribute("type", "time").attribute("placeholder", "z.B. 08:00")
@@ -106,7 +124,30 @@ function createShiftTable() {
                     new ElementBuilder("td").children(
                         new ElementBuilder("input").attribute("type", "time").attribute("placeholder", "z.B. 15:30")
                     )
-                )
+                ),
+                new ElementBuilder("tr").children(
+                    new ElementBuilder("td").children(
+                        "&emsp;"
+                    ).cssClass("popup-table-caption"),
+                    new ElementBuilder("td")
+                ),
+                new ElementBuilder("tr").children(
+                    new ElementBuilder("td").children(
+                        "Mitarbeiter"
+                    ).cssClass("popup-table-caption"),
+                    new ElementBuilder("td").children(
+                        mitarbeiterDropdown.build()
+                    )
+                ),
+                new ElementBuilder("tr").children(
+                    new ElementBuilder("td").children(
+                        "CM"
+                    ).cssClass("popup-table-caption"),
+                    new ElementBuilder("td").children(
+                        cmDropdown.build()
+                    )
+                ),
+
             )
         )
     ).parent(parentTable).build();
@@ -116,8 +157,9 @@ function createShiftTable() {
 
 function addShift(addEvent) {
     console.log(new Date(addEvent.startStr));
+    addShiftPopup();
+    calendar.unselect();
 
-    calendar.unselect()
     /*calendar.addEvent({
         title: "Test",
         start: addEvent.startStr,
