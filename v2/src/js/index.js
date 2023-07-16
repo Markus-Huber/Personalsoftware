@@ -96,7 +96,15 @@ function createShiftTable() {
                         "Beginn"
                     ).cssClass("popup-table-caption"),
                     new ElementBuilder("td").children(
-                        new ElementBuilder("input").attribute("type", "time").attribute("placeholder", "z.B. 08:00 Uhr")
+                        new ElementBuilder("input").attribute("type", "time").attribute("placeholder", "z.B. 08:00")
+                    )
+                ),
+                new ElementBuilder("tr").children(
+                    new ElementBuilder("td").children(
+                        "Ende"
+                    ).cssClass("popup-table-caption"),
+                    new ElementBuilder("td").children(
+                        new ElementBuilder("input").attribute("type", "time").attribute("placeholder", "z.B. 15:30")
                     )
                 )
             )

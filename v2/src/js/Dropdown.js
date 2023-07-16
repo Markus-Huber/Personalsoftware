@@ -33,6 +33,7 @@ function Dropdown(_config) {
     options.appendChild(p);
   }
 
+
   parent.appendChild(input);
 
   var pick = document.createElement("span");
@@ -45,11 +46,14 @@ function Dropdown(_config) {
   // Items Container
   this.dropdownlist = input.parentElement.getElementsByClassName("dropdownlist")[0];
   // Current Item
-  this.currentitem = null;
+  this.currentitem = options.children.length > 0 ? options.children[0] : null;
+  if (this.currentitem != null) {
+    this.currentitem.classList.add("light");
+  }
   // Current Item Index
-  this.currentitemindex = null;
+  this.currentitemindex = 0;
   // Visible Items Count
-  this.visiblecount = 0;
+  this.visiblecount = 2;
   var self = this;
   var enableListener = false;
   var notFound = document.createElement("p");
@@ -87,7 +91,7 @@ function Dropdown(_config) {
       self.dropdownlist.classList.add("combobox-close");
 
       setTimeout(() => {
-        self.dropdownlist.classList.remove("combobox-close");        
+        self.dropdownlist.classList.remove("combobox-close");
       }, 290);
       pick.style.transform = null;
       enableListener = false;
@@ -213,53 +217,38 @@ function Dropdown(_config) {
     // Binding OnKeyDown Event
     e = e || window.event;
 
+    // enter
     if (e.keyCode === 13) {
-      // enter
-      if (self.visiblecount != 0) {
-        var upv = self.currentitem.innerHTML;
-        upv = upv.replace(/\<b\>/ig, '');
-        upv = upv.replace(/\<\/b\>/ig, '');
-        input.value = upv;
+      let findNextMatching = () => {
+        for (let counter = 0; counter < self.listitems.length; counter++) {
+          if (self.listitems[counter].style.display == "block") {
+            var upv = self.listitems[counter].innerHTML;
+            upv = upv.replace(/\<b\>/ig, '');
+            upv = upv.replace(/\<\/b\>/ig, '');
+            input.value = upv;
+
+            break;
+          }
+        }
       }
+
+      if (!isEmpty(self.currentitem)) {
+        if (self.currentitem.style.display != "none") {
+          var upv = self.currentitem.innerHTML;
+          upv = upv.replace(/\<b\>/ig, '');
+          upv = upv.replace(/\<\/b\>/ig, '');
+          input.value = upv;
+        } else {
+          findNextMatching();
+        }
+      } else {
+        findNextMatching();
+      }
+
       setVisible(false);
       e.cancelBubble = true;
       return false;
     } else {
-      setVisible(true);
-      self.visiblecount = 0;
-      try {
-        self.dropdownlist.removeChild(notFound);
-      } catch (error) {}
-
-      if (input.value === '') {
-        for (var i = 0; i < self.listitems.length; i++) {
-          self.listitems[i].style.display = 'block';
-          self.visiblecount++;
-          var pv = self.listitems[i].innerHTML;
-          pv = pv.replace(/\<b\>/ig, '');
-          self.listitems[i].innerHTML = pv.replace(/\<\/b\>/ig, '');
-        }
-      } else {
-        var re = new RegExp('(' + input.value + ')', "i");
-        var atLeastOne = false;
-        for (var i = 0; i < self.listitems.length; i++) {
-          var pv = self.listitems[i].innerHTML;
-          pv = pv.replace(/\<b\>/ig, '');
-          pv = pv.replace(/\<\/b\>/ig, '');
-          if (re.test(pv)) {
-            self.listitems[i].style.display = 'block';
-            self.visiblecount++;
-            self.listitems[i].innerHTML = pv.replace(re, '<b>$1</b>');
-            atLeastOne = true;
-          } else {
-            self.listitems[i].style.display = 'none';
-          }
-        }
-        if (!atLeastOne) {
-          self.dropdownlist.appendChild(notFound);
-        }
-      }
-
       if (e.keyCode === 38) {
         // Move Selection Up
         if (self.visiblecount > 0) {
@@ -320,6 +309,53 @@ function Dropdown(_config) {
         if (navigator.appName != 'Microsoft Internet Explorer') {
           e.preventDefault();
           e.stopPropagation();
+        }
+      }
+
+
+      if (isEmpty(input.value)) {
+        for (let counter = 0; counter < self.listitems.length; counter++) {
+          self.listitems[counter].style.display = '';
+          var upv = self.listitems[counter].innerHTML;
+          upv = upv.replace(/\<b\>/ig, '');
+          upv = upv.replace(/\<\/b\>/ig, '');
+          self.listitems[counter].innerHTML = upv;
+        }
+        return;
+      }
+
+      setVisible(true);
+      self.visiblecount = 0;
+      try {
+        self.dropdownlist.removeChild(notFound);
+      } catch (error) {}
+
+      if (input.value === '') {
+        for (var i = 0; i < self.listitems.length; i++) {
+          self.listitems[i].style.display = 'block';
+          self.visiblecount++;
+          var pv = self.listitems[i].innerHTML;
+          pv = pv.replace(/\<b\>/ig, '');
+          self.listitems[i].innerHTML = pv.replace(/\<\/b\>/ig, '');
+        }
+      } else {
+        var re = new RegExp('(' + input.value + ')', "i");
+        var atLeastOne = false;
+        for (var i = 0; i < self.listitems.length; i++) {
+          var pv = self.listitems[i].innerHTML;
+          pv = pv.replace(/\<b\>/ig, '');
+          pv = pv.replace(/\<\/b\>/ig, '');
+          if (re.test(pv)) {
+            self.listitems[i].style.display = 'block';
+            self.visiblecount++;
+            self.listitems[i].innerHTML = pv.replace(re, '<b>$1</b>');
+            atLeastOne = true;
+          } else {
+            self.listitems[i].style.display = 'none';
+          }
+        }
+        if (!atLeastOne) {
+          self.dropdownlist.appendChild(notFound);
         }
       }
     }

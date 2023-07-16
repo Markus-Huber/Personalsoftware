@@ -338,6 +338,7 @@ menu-item-header .open-close-icon {
 .popup .popup-table tr {
     width: 100%;
     display: flex;
+    padding-bottom: 0.5rem;
 }
 
 .popup .popup-table tr td {
