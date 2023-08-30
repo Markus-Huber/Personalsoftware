@@ -29,6 +29,11 @@ CREATE TABLE workinghours (
   hours 			time 			NOT NULL
 );
 
+create table standort(
+  id 				int 			NOT NULL 	PRIMARY KEY AUTO_INCREMENT,
+  name    varchar(255) 	NOT NULL
+);
+
 CREATE TABLE employee (
   id 				int 			NOT NULL 	PRIMARY KEY AUTO_INCREMENT,
   isAdmin 			tinyint 					DEFAULT '0',
@@ -39,6 +44,15 @@ CREATE TABLE employee (
   lastName 			varchar(255) 	NOT NULL,
   
   FOREIGN KEY (workingHours) 		REFERENCES workinghours(id)
+);
+
+CREATE TABLE employeestandort (
+  id 				int 			NOT NULL 	PRIMARY KEY AUTO_INCREMENT,
+  employee 			int				NOT NULL,
+  standort 			int 			NOT NULL,
+
+  FOREIGN KEY (employee) 			REFERENCES employee (id),
+  FOREIGN KEY (standort) 				REFERENCES standort (id)
 );
 
 CREATE TABLE employeeshift (
@@ -63,3 +77,12 @@ CREATE TABLE employeeswitchedshift (
 
 INSERT INTO employee (isAdmin, firstName, lastName)
 VALUES (1,NULL,'HUM'),(0,'Max','Mustermann');
+
+INSERT INTO division(name)
+VALUES('Kasse 1'),('Kasse 2'),('Kasse 3'),('Kasse 4'),('Zureicher'),('TL'),('Reingigung 1'),('Reingigung 2');
+
+INSERT INTO standort(name)
+VALUES('Dingolfing');
+
+INSERT INTO employeestandort(employee, standort)
+VALUES (1,1),(2,1);

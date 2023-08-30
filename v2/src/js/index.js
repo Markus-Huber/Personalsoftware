@@ -3,6 +3,9 @@ let weekDays = [];
 let startDayOfShift = 4;
 let content;
 let defaultShifts = [];
+let mitarbeiter = [];
+let standort = 1;
+let cms = [];
 
 document.addEventListener('DOMContentLoaded', function () {
     content = document.getElementsByClassName("content")[0];
@@ -67,7 +70,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     weekDays = weekDays.slice(startDayOfShift - 1).concat(weekDays.slice(0, startDayOfShift - 1));
 
-    addShiftPopup();
+    new xmlHttpRequestHelper("src/php/requestMitarbeiter.php", "standort="+standort, true, true, (mitarbeiterRaw) => {
+        mitarbeiter = Mitarbeiter.marshall(mitarbeiterRaw);
+        new xmlHttpRequestHelper("src/php/requestCM.php", "", true, true, (cmsRaw) => {
+            cms = CM.marshall(cmsRaw);
+            addShiftPopup();
+        });
+    });
 });
 
 function addShiftPopup() {
@@ -85,19 +94,23 @@ function addShiftPopup() {
         placeholder: "z.B. " + weekDays[0]
     }).metaName("wochentag").setValue();
 
+    let mitarbeiterById = {};
+    mitarbeiter.forEach(arbeiter => mitarbeiterById[arbeiter.getId()] = arbeiter.resolveName());
+
     let mitarbeiterDropdown = new Dropdown({
-        data: Object.assign({}, weekDays),
+        data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
     }).metaName("mitarbeiter").setValue();
 
+    let cmsById = {};
+    cms.forEach(cm => cmsById[cm.getId()] = cm.getName());
+
     let cmDropdown = new Dropdown({
-        data: Object.assign({}, weekDays),
+        data: Object.assign({}, cmsById),
         placeholder: "z.B. Kasse 1"
     }).metaName("cm").setValue();
 
-
     let parentTable = new ElementBuilder("table").cssClass("popup-table");
-
     new ElementBuilder("tr").children(
         new ElementBuilder("td").children(
             new ElementBuilder("table").children(
@@ -147,11 +160,9 @@ function addShiftPopup() {
                         cmDropdown.build()
                     )
                 ),
-
             )
         )
     ).parent(parentTable).build();
-
     parent.appendChild(parentTable.build());
 }
 

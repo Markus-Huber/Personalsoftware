@@ -76,6 +76,8 @@ function xmlHttpRequestHelper(requestURL, params, isPost, isAsync, successCallba
             }
             if (!isEmpty(errorCallback)) {
                 errorCallback(this.responseText);
+            }else{
+                console.error(this.responseText);
             }
             return xmlhttp;
         }
