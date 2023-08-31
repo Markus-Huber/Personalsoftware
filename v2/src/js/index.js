@@ -79,102 +79,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-function addShiftPopup() {
-    let parent = new ElementBuilder("div").attribute("id", "schichtplan-neue-schicht").parent(content).cssClass("popup").build();
-
-    new ElementBuilder("div").cssClass("popup-header").children(
-        new ElementBuilder("h2").children("Schicht planen"),
-        new ElementBuilder("h2").children("✖").cssClass("hover-effect-zoom").onclick(() => {
-            parent.parentElement.removeChild(parent);
-        }),
-    ).parent(parent).build();
-
-    let wochentagDropdown = new Dropdown({
-        data: Object.assign({}, weekDays),
-        placeholder: "z.B. " + weekDays[0]
-    }).metaName("wochentag").setValue();
-
-    let mitarbeiterById = {};
-    mitarbeiter.forEach(arbeiter => mitarbeiterById[arbeiter.getId()] = arbeiter.resolveName());
-
-    let mitarbeiterDropdown = new Dropdown({
-        data: mitarbeiterById,
-        placeholder: "z.B. Max Mustermann"
-    }).metaName("mitarbeiter").setValue();
-
-    let cmsById = {};
-    cms.forEach(cm => cmsById[cm.getId()] = cm.getName());
-
-    let cmDropdown = new Dropdown({
-        data: Object.assign({}, cmsById),
-        placeholder: "z.B. Kasse 1"
-    }).metaName("cm").setValue();
-
-    let parentTable = new ElementBuilder("table").cssClass("popup-table");
-    new ElementBuilder("tr").children(
-        new ElementBuilder("td").children(
-            new ElementBuilder("table").children(
-                new ElementBuilder("tr").children(
-                    new ElementBuilder("td").children(
-                        "Wochentag"
-                    ).cssClass("popup-table-caption"),
-                    new ElementBuilder("td").children(
-                        wochentagDropdown.build()
-                    )
-                ),
-                new ElementBuilder("tr").children(
-                    new ElementBuilder("td").children(
-                        "Anfang"
-                    ).cssClass("popup-table-caption"),
-                    new ElementBuilder("td").children(
-                        new ElementBuilder("input").attribute("type", "time").attribute("placeholder", "z.B. 08:00")
-                    )
-                ),
-                new ElementBuilder("tr").children(
-                    new ElementBuilder("td").children(
-                        "Ende"
-                    ).cssClass("popup-table-caption"),
-                    new ElementBuilder("td").children(
-                        new ElementBuilder("input").attribute("type", "time").attribute("placeholder", "z.B. 15:30")
-                    )
-                ),
-                new ElementBuilder("tr").children(
-                    new ElementBuilder("td").children(
-                        "&emsp;"
-                    ).cssClass("popup-table-caption"),
-                    new ElementBuilder("td")
-                ),
-                new ElementBuilder("tr").children(
-                    new ElementBuilder("td").children(
-                        "Mitarbeiter"
-                    ).cssClass("popup-table-caption"),
-                    new ElementBuilder("td").children(
-                        mitarbeiterDropdown.build()
-                    )
-                ),
-                new ElementBuilder("tr").children(
-                    new ElementBuilder("td").children(
-                        "CM"
-                    ).cssClass("popup-table-caption"),
-                    new ElementBuilder("td").children(
-                        cmDropdown.build()
-                    )
-                ),
-            )
-        )
-    ).parent(parentTable).build();
-    parent.appendChild(parentTable.build());
-}
-
-function addShift(addEvent) {
-    console.log(new Date(addEvent.startStr));
-    addShiftPopup();
-    calendar.unselect();
-
-    /*calendar.addEvent({
-        title: "Test",
-        start: addEvent.startStr,
-        end: addEvent.endStr,
-        allDay: false
-    })*/
+function closeSomething(dirty, yesCallback){
+    if(dirty){
+        yesCallback();        
+    }else{
+        yesCallback();
+    }
 }

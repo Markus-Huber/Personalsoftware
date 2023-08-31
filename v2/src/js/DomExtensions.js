@@ -11,6 +11,13 @@ Array.prototype.remove = function () {
     return this;
 };
 
+Array.prototype.concatIfNotNull = function(items){
+    if(!isEmpty(items)){
+        return this.concat(items);
+    }
+    return this;
+}
+
 Date.prototype.standardDate = function () {
     var mm = this.getMonth() + 1;
     var dd = this.getDate();
@@ -22,6 +29,45 @@ Date.prototype.standardDate = function () {
 };
 
 const isVisible = elem => !!elem && !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
+
+/**
+ * Diese Methode prüft gänige HTMl Elemente, ob sie leer sind.
+ * Strings, Objekte, JSON Arrays, Arrays, gültige HTML Elemente.
+ * 
+ * Prüft auf null, undefined und bei Strings auf die getrimmte Länge
+ * 
+ * @param {*} elem ein beliebiges HTML Element
+ */
+function isEmpty(elem) {
+    if (elem != null && elem != undefined && elem != 'undefined') {
+        if (typeof elem === 'string') {
+            if (elem.trim().length > 0) {
+                return false;
+            }
+            return true;
+        }
+
+        if (!isElement(elem) && elem.constructor == ({}).constructor && Object.keys(elem).length < 1) {
+            return true;
+        }
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Diese Methode prüft für JSON Elemente, ob Parameter definiert sind.
+ * 
+ * Prüft auf null und undefined
+ * 
+ * @param {*} elem ein JSON Element
+ */
+function isUndefined(elem) {
+    if (elem != null && elem != undefined && elem != 'undefined') {
+        return false;
+    }
+    return true;
+}
 
 function isElement(obj) {
     try {
@@ -82,6 +128,31 @@ function xmlHttpRequestHelper(requestURL, params, isPost, isAsync, successCallba
             return xmlhttp;
         }
     }
+}
+
+/**
+ * Nimmt eine Form von HTML Iterable, wie einen Dom- Childlist und wandelt sie in einen statischen Array um.
+ * Diese Methode existiert da zum Beispiel eine Liste von Kind- Elementen dynamisch ist und es zu 
+ * ConcurrentModificationExceptions kommt wenn diese Kinder verändert werden währen der Array durch iteriert wird
+ * 
+ * @param {*} original das originale Array oder eine ander Instanz von Iterable
+ * @returns eine statische Liste ohne Referenzen auf das original
+ */
+function fromArray(original) {
+    var ret = [],
+        length = original.length;
+
+    for (var i = 0; i < length; i++) {
+        ret.push(original[i]);
+    }
+    return ret;
+}
+
+function formatTimeHHMM(date){
+    if(isEmpty(date)){
+        date = new Date();
+    }
+    return date.toLocaleTimeString("de-de").substring(0, date.toLocaleTimeString().length - 3)
 }
 
 function formatDate(date) {

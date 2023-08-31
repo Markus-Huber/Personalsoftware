@@ -1,44 +1,7 @@
-/**
- * Diese Methode prüft gänige HTMl Elemente, ob sie leer sind.
- * Strings, Objekte, JSON Arrays, Arrays, gültige HTML Elemente.
- * 
- * Prüft auf null, undefined und bei Strings auf die getrimmte Länge
- * 
- * @param {*} elem ein beliebiges HTML Element
- */
-function isEmpty(elem) {
-    if (elem != null && elem != undefined && elem != 'undefined') {
-        if (typeof elem === 'string') {
-            if (elem.trim().length > 0) {
-                return false;
-            }
-            return true;
-        }
-
-        if (!isElement(elem) && elem.constructor == ({}).constructor && Object.keys(elem).length < 1) {
-            return true;
-        }
-        return false;
-    }
-    return true;
-}
-
-/**
- * Diese Methode prüft für JSON Elemente, ob Parameter definiert sind.
- * 
- * Prüft auf null und undefined
- * 
- * @param {*} elem ein JSON Element
- */
-function isUndefined(elem) {
-    if (elem != null && elem != undefined && elem != 'undefined') {
-        return false;
-    }
-    return true;
-}
-
 /** Builder Pattern, um ohne viel Code zu schreiben HTML Elemente erstellen zu können.*/
 class ElementBuilder {
+    _timeout;
+
     /** 
      * Erstellt einen Builder, der benutzt werden kann um schnell und ohne viel Code zu schreiben HTML Elemente zu erstellen.
      *
@@ -97,6 +60,22 @@ class ElementBuilder {
                 this.m_ChildElement.setAttribute("data-attribute", _name);
             } else {
                 this.m_ChildElement.children[0].setAttribute("data-attribute", _name);
+            }
+        }
+        return this;
+    }
+
+    changeListener = function (changeListener) {
+        if (!isEmpty(changeListener)) {
+            if (this.m_HtmlElement == "input") {
+                this.m_ChildElement.addEventListener("change", function (event) {
+                    if (!isEmpty(this._timeout)) {
+                        window.clearTimeout(this._timeout);
+                    }
+                    this._timeout = window.setTimeout(() => {
+                        changeListener(event, this.value);
+                    }, 100);
+                });
             }
         }
         return this;
@@ -359,6 +338,7 @@ class ElementBuilder {
                     showAlert("warning", "Der eingegebene Wert [" + this.m_ChildElement.value + "] ist ungültig.<br>" +
                         "Korrigierten Wert " + value + " übernehmen?", () => {
                             this.m_ChildElement.value = value;
+                            this.m_ChildElement.dispatchEvent(new Event('change'));
                         }, () => {
                             this.m_ChildElement.focus();
                         });
@@ -437,7 +417,7 @@ function showAlert(type, message, okCallback, abortCallback) {
 
     popup.children(new ElementBuilder("div").cssClass("buttons").children(
         new ElementBuilder("button").children("Akzeptieren").onclick(() => {
-            if(okCallback){
+            if (okCallback) {
                 okCallback();
                 for (let i = 0; i < document.getElementsByClassName("alert").length; i++) {
                     document.getElementsByClassName("alert")[0].parentElement.removeChild(document.getElementsByClassName("alert")[0]);
@@ -445,7 +425,7 @@ function showAlert(type, message, okCallback, abortCallback) {
             }
         }),
         new ElementBuilder("button").children("Abbrechen").onclick(() => {
-            if(abortCallback){
+            if (abortCallback) {
                 abortCallback();
                 for (let i = 0; i < document.getElementsByClassName("alert").length; i++) {
                     document.getElementsByClassName("alert")[0].parentElement.removeChild(document.getElementsByClassName("alert")[0]);
@@ -454,24 +434,6 @@ function showAlert(type, message, okCallback, abortCallback) {
         }),
     ), );
     popup.build();
-}
-
-/**
- * Nimmt eine Form von HTML Iterable, wie einen Dom- Childlist und wandelt sie in einen statischen Array um.
- * Diese Methode existiert da zum Beispiel eine Liste von Kind- Elementen dynamisch ist und es zu 
- * ConcurrentModificationExceptions kommt wenn diese Kinder verändert werden währen der Array durch iteriert wird
- * 
- * @param {*} original das originale Array oder eine ander Instanz von Iterable
- * @returns eine statische Liste ohne Referenzen auf das original
- */
-function fromArray(original) {
-    var ret = [],
-        length = original.length;
-
-    for (var i = 0; i < length; i++) {
-        ret.push(original[i]);
-    }
-    return ret;
 }
 
 function getTopPopup() {

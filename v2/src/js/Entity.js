@@ -1,4 +1,6 @@
 class Shift {
+    _mitarbeiter = [];
+
     constructor(id, weekday, begin, end, cm) {
         this._id = id;
         this._weekday = weekday;
@@ -15,16 +17,44 @@ class Shift {
         return this._weekday;
     }
 
+    setWeekday(weekday) {
+        this._weekday = weekday;
+    }
+
     getBegin() {
         return this._begin;
+    }
+
+    setBegin(begin) {
+        this._begin = begin;
     }
 
     getEnd() {
         return this._end;
     }
 
+    setEnd(end) {
+        this._end = end;
+    }
+
     getCM(){
         return this._cm;
+    }
+
+    setCM(cm) {
+        this._cm = cm;
+    }
+
+    getMitarbeiter(){
+        return this._mitarbeiter;
+    }
+
+    setMitarbeiter(mitarbeiter){
+        this._mitarbeiter = [].concat(mitarbeiter);
+    }
+
+    getBeginStr(){
+        
     }
 
     static marshall(data){

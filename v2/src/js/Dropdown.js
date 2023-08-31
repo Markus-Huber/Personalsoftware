@@ -4,6 +4,7 @@ function Dropdown(_config) {
   var _metaName = "";
   var m_ChangeListeners = [];
   var parent = document.createElement("div");
+  var noValue = true;
   parent.classList.add("combobox");
 
   var isSmall = false;
@@ -15,8 +16,11 @@ function Dropdown(_config) {
       window.clearTimeout(timeOut);
     }
     timeOut = window.setTimeout(() => {
+      let item = {};
+      item[self.getValue()] = Object.values(children)[self.getValue()];
+
       for (var i = 0; i < m_ChangeListeners.length; i++) {
-        m_ChangeListeners[i](event);
+        m_ChangeListeners[i](event, item);
       }
     }, 100);
   });
@@ -32,7 +36,6 @@ function Dropdown(_config) {
     p.id = "ID_" + key;
     options.appendChild(p);
   }
-
 
   parent.appendChild(input);
 
@@ -130,6 +133,7 @@ function Dropdown(_config) {
       var evt = document.createEvent("HTMLEvents");
       evt.initEvent("change", false, true);
       input.dispatchEvent(evt);
+      noValue = false;
 
       setVisible(false);
       for (var j = 0; j < self.listitems.length; j++) {
@@ -169,6 +173,8 @@ function Dropdown(_config) {
   }
 
   this.setValue = function (key) {
+    noValue = isEmpty(key);
+
     for (var i = 0; i < self.listitems.length; i++) {
       if (self.listitems[i].id == "ID_" + key) {
         self.listitems[i].click();
@@ -204,8 +210,20 @@ function Dropdown(_config) {
   }
 
   this.getValue = function () {
+    if(noValue){
+      return null;
+    }
     if (!isEmpty(self.currentitem) && !isEmpty(self.currentitem.id)) {
       return self.currentitem.id.replace("ID_", "");
+    }
+    return null;
+  }
+
+  this.getValueEx = function () {
+    if (!isEmpty(self.currentitem) && !isEmpty(self.currentitem.id)) {
+      let item = {};
+      item[self.getValue()] = Object.values(children)[self.getValue()];
+      return item;
     }
     return null;
   }
