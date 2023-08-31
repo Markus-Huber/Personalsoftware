@@ -399,7 +399,7 @@ class ElementBuilder {
     }
 }
 
-function showAlert(type, message, okCallback, abortCallback) {
+function showAlert(type, message, okCallback, abortCallback, okMessage = "Akzeptieren", abortMessage = "Abbrechen") {
     for (let i = 0; i < document.getElementsByClassName("alert").length; i++) {
         document.getElementsByClassName("alert")[0].parentElement.removeChild(document.getElementsByClassName("alert")[0]);
     }
@@ -416,7 +416,7 @@ function showAlert(type, message, okCallback, abortCallback) {
     popupContent.build();
 
     popup.children(new ElementBuilder("div").cssClass("buttons").children(
-        new ElementBuilder("button").children("Akzeptieren").onclick(() => {
+        new ElementBuilder("button").children(okMessage).onclick(() => {
             if (okCallback) {
                 okCallback();
                 for (let i = 0; i < document.getElementsByClassName("alert").length; i++) {
@@ -424,7 +424,7 @@ function showAlert(type, message, okCallback, abortCallback) {
                 }
             }
         }),
-        new ElementBuilder("button").children("Abbrechen").onclick(() => {
+        new ElementBuilder("button").children(abortMessage).onclick(() => {
             if (abortCallback) {
                 abortCallback();
                 for (let i = 0; i < document.getElementsByClassName("alert").length; i++) {

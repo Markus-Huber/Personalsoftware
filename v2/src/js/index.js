@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     weekDays = weekDays.slice(startDayOfShift - 1).concat(weekDays.slice(0, startDayOfShift - 1));
 
-    new xmlHttpRequestHelper("src/php/requestMitarbeiter.php", "standort="+standort, true, true, (mitarbeiterRaw) => {
+    new xmlHttpRequestHelper("src/php/requestMitarbeiter.php", "standort=" + standort, true, true, (mitarbeiterRaw) => {
         mitarbeiter = Mitarbeiter.marshall(mitarbeiterRaw);
         new xmlHttpRequestHelper("src/php/requestCM.php", "", true, true, (cmsRaw) => {
             cms = CM.marshall(cmsRaw);
@@ -79,10 +79,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-function closeSomething(dirty, yesCallback){
-    if(dirty){
-        yesCallback();        
-    }else{
-        yesCallback();
+function closeSomething(dirty, yesCallback) {
+    if (dirty) {
+        showAlert("warning", "Es sind bereits Daten eingegeben, <br>wollen Sie diesen Eintrag wirklich verwerfen?", yesCallback, () => {}, "Ja", "Nein")
+        return;
     }
+    yesCallback();
 }

@@ -18,11 +18,7 @@ function addShiftPopup(begin, end) {
             parent.parentElement.removeChild(parent);
         }),
         new ElementBuilder("h2").children("✖").title("Schließen").cssClass("hover-effect-zoom").onclick(() => {
-            if (dirty) {
-
-            } else {
-                closeSomething(dirty, () => parent.parentElement.removeChild(parent));
-            }
+            closeSomething(dirty, () => parent.parentElement.removeChild(parent));
         }),
     ).parent(parent).build();
 
