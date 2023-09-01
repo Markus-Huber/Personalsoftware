@@ -20,6 +20,7 @@
     <script src="src/js/Entity.js"></script>
     <script src="src/js/Index.js"></script>
     <script src="src/js/Shift.js"></script>
+    <script src="src/js/Mitarbeiter.js"></script>
 </head>
 
 <body>
@@ -88,7 +89,7 @@
                 <div class="menu-item-children">
                     <div class="display-flex hover-effect-leap-right">
                         <img src="src/img/icon/add.png" />
-                        <div title="Neuen Schichplan erstellen">Neu</div>
+                        <div title="Neuen Schichplan erstellen" onclick="showShift()">Neu</div>
                     </div>
                     <div class="display-flex hover-effect-leap-right">
                         <img src="src/img/icon/current.png" />
@@ -117,7 +118,7 @@
                 <div class="menu-item-children">
                     <div class="display-flex hover-effect-leap-right">
                         <img class="color-inverted" src="src/img/icon/user.png" />
-                        <div>Mitarbeiter</div>
+                        <div onclick="showMitarbeiter()">Mitarbeiter</div>
                     </div>
                     <div class="display-flex hover-effect-leap-right">
                         <img src="src/img/icon/location.png" />
@@ -131,7 +132,6 @@
             </div>
         </div>
         <div class="content">
-            <div id='schichtplan-creator'></div>
         </div>
     </div>
 </body>

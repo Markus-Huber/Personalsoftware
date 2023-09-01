@@ -43,7 +43,7 @@ body:has(.alert) .content {
     background: rgba(245, 245, 245, 1);
 }
 
-.required{
+.required {
     color: mediumvioletred;
     font-weight: bold;
 }
@@ -213,7 +213,8 @@ body:has(.alert) .content {
     margin-left: 2.5rem;
     flex-direction: column;
 }
-.navigation-bar .menu-item .menu-item-children > div{
+
+.navigation-bar .menu-item .menu-item-children>div {
     padding: 0.25em 0;
 }
 
@@ -280,9 +281,10 @@ menu-item-header .open-close-icon {
     padding: 1rem 2rem 0 2rem;
 }
 
-#schichtplan-creator {
+#schichtplan-creator,
+#mitarbeiter-overview {
     width: 100%;
-    max-height: 90%;
+    max-height: calc(100% - 2em);
 }
 
 @keyframes popup {
@@ -469,4 +471,42 @@ menu-item-header .open-close-icon {
         overflow: visible;
         min-width: 20vw;
     }
+}
+
+.basic-data-header h2 {
+    font-size: 1.75em;
+}
+
+.basic-data-body{
+    height: calc(100% - 4em);
+    overflow-y: auto;
+}
+
+.basic-data-body .basic-data-table, 
+.basic-data-body .basic-data-table tr
+{
+    width: 100%;
+    border-spacing: 0;
+}
+
+.basic-data-body .basic-data-table tr:nth-child(odd):not(:has(th))
+{
+    background-color: rgba(100,100,100,.5);
+}
+
+.basic-data-body .basic-data-table tr:nth-child(even):not(:has(th))
+{
+    background-color: rgba(80,80,80,.5);
+}
+
+.basic-data-body .basic-data-table tr th,
+.basic-data-body .basic-data-table tr td{
+    text-align: left;
+    font-size: 1.25em;
+    padding: 0.5em;
+}
+
+.basic-data-body .basic-data-table .basic-data-table-add{
+    height: 1.75em;
+    cursor: pointer;
 }

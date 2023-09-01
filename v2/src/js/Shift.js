@@ -1,5 +1,74 @@
 let shifts = [];
 
+function showShift(){
+    content.innerHTML = null;
+    new ElementBuilder("div").parent(content).id("schichtplan-creator").build();
+
+    const calendarEl = document.getElementById('schichtplan-creator')
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'timeGridWeek',
+        titleFormat: {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        },
+        dayHeaderFormat: {
+            weekday: 'long',
+            month: '2-digit',
+            day: '2-digit'
+        },
+        headerToolbar: {
+            center: "title",
+            left: "",
+        },
+        locale: 'de',
+        firstDay: startDayOfShift,
+        allDaySlot: false,
+        businessHours: {
+            daysOfWeek: [1, 2, 3, 4, 5, 6, 0],
+            startTime: '14:00',
+            endTime: '24:00',
+        },
+        slotLabelFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            omitZeroMinute: false,
+            meridiem: 'full'
+        },
+        scrollTime: '14:00:00',
+
+        selectable: true,
+        selectMirror: true,
+        buttonText: {
+            today: 'Aktueller Plan',
+        },
+        buttonHints: {
+            today: 'Aktueller Plan',
+            prev: "Vorheriger Plan",
+            next: "Nächster Plan",
+        },
+
+        // Create new event
+        select: function (arg) {
+            addShift(arg);
+        },
+
+        eventContent: function( info ) {
+            return {html: info.event.title};
+        }
+    })
+    calendar.render();
+
+    let date = new Date('2022/08/22');
+    for (let i = 0; i <= 6; i++) {
+        weekDays[i] = new Weekday(i, date.toLocaleDateString("de-DE", {
+            weekday: 'long'
+        }));
+        date.setDate(date.getDate() + 1);
+    }
+    weekDays = weekDays.slice(startDayOfShift - 1).concat(weekDays.slice(0, startDayOfShift - 1));
+}
+
 function addShiftPopup(begin, end) {
     if (isEmpty(begin)) {
         begin = new Date("2023-08-31 12:08:03");
@@ -26,14 +95,21 @@ function addShiftPopup(begin, end) {
                 (shift.getMitarbeiter().length < 1 ? "<i>Mitarbeiter eins</i><br>" : "") +
                 (isEmpty(shift.getWeekday()) ? "<i>Wochentag</i><br>" : "") +
                 "dürfen nicht leer sein&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;";
-            showAlert("warning", message, () => {}, () => {}, "OK", "", true);
+            showAlert("warning", message, true, () => {}, () => {}, "OK", "", true);
             return;
         }
         saveShift(shift, begin, end);
         parent.parentElement.removeChild(parent);
     }
 
-    let closeFunction = () => closeSomething(dirty, () => parent.parentElement.removeChild(parent));
+    let closeFunction = () => closeSomething(dirty, () => {
+        parent.parentElement.removeChild(parent);
+        const event = new Event("popupClosed");
+        parent.dispatchEvent(event);
+    }, () => {
+        const event = new Event("popupNotClosed");
+        parent.dispatchEvent(event);
+    });
 
     new ElementBuilder("div").cssClass("popup-header").children(
         new ElementBuilder("h2").children("Schicht planen"),
@@ -95,7 +171,7 @@ function addShiftPopup(begin, end) {
     cms.forEach(cm => cmsById[cm.getId()] = cm.getName());
 
     let cmDropdown = new Dropdown({
-        data: Object.assign({}, cmsById),
+        data: cmsById,
         placeholder: "z.B. Kasse 1"
     }).metaName("cm").setValue().changeListener((event, item) => {
         shift.setCM(Object.keys(item)[0]);

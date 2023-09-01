@@ -336,7 +336,7 @@ class ElementBuilder {
                     }
 
                     showAlert("warning", "Der eingegebene Wert [" + this.m_ChildElement.value + "] ist ungültig.<br>" +
-                        "Korrigierten Wert " + value + " übernehmen?", () => {
+                        "Korrigierten Wert " + value + " übernehmen?", true, () => {
                             this.m_ChildElement.value = value;
                             this.m_ChildElement.dispatchEvent(new Event('change'));
                         }, () => {
@@ -344,11 +344,9 @@ class ElementBuilder {
                         });
                 }
 
-            }
-            else if(_property == "required" && _value){
+            } else if (_property == "required" && _value) {
                 this.m_ChildElement.innerHTML = this.m_ChildElement.innerHTML + "<font class='required'>&nbsp;*</font>";
-            } 
-            else {
+            } else {
                 this.m_ChildElement.setAttribute(_property, isEmpty(_value) ? "" : _value);
             }
         }
@@ -403,23 +401,25 @@ class ElementBuilder {
     }
 }
 
-function showAlert(type, message, okCallback, abortCallback, okMessage = "Akzeptieren", abortMessage = "Abbrechen", onlyOneButton) {
+function showAlert(type, message, modal, okCallback, abortCallback, okMessage = "Akzeptieren", abortMessage = "Abbrechen", onlyOneButton) {
     for (let i = 0; i < document.getElementsByClassName("alert").length; i++) {
         document.getElementsByClassName("alert")[0].parentElement.removeChild(document.getElementsByClassName("alert")[0]);
     }
 
     let popup = new ElementBuilder("div").cssClass("alert").parent(content);
-    let popupContent = new ElementBuilder("div").cssClass("content-wrapper").parent(popup);
+    let popupContent = new ElementBuilder("div").cssClass("alert-content").parent(popup).build();
+    let contentWrapper = new ElementBuilder("div").cssClass("content-wrapper").parent(popupContent)
     let image = new ElementBuilder("img").cssClass("type");
     if (type == "warning") {
         image.attribute("src", "src/img/icon/warning.PNG");
     }
-    popupContent.children(image, new ElementBuilder("div").cssClass("message-wrapper").children(
+    contentWrapper.children(image, new ElementBuilder("div").cssClass("message-wrapper").children(
         new ElementBuilder("div").cssClass("message").children(message)
     ));
-    popupContent.build();
+    contentWrapper.build();
 
-    popup.children(new ElementBuilder("div").cssClass("buttons").children(
+    //TODO: Wenn modal dann alles im Hintergrund blockieren..
+    new ElementBuilder("div").cssClass("buttons").children(
         new ElementBuilder("button").children(okMessage).onclick(() => {
             if (okCallback) {
                 okCallback();
@@ -436,26 +436,42 @@ function showAlert(type, message, okCallback, abortCallback, okMessage = "Akzept
                 }
             }
         }),
-    ), );
+    ).parent(popupContent).build();
     popup.build();
 }
 
-function getTopPopup() {
-    return findTopPopup();
-}
+function askOpenedPopupToClose(successCallback) {
+    var openWindows = document.getElementsByClassName("popup");
+    switch (openWindows.length) {
+        case 0:
+            if(!isEmpty(successCallback)){
+                successCallback();
+            }
+            break;
+        case 1:
+            let successListener = () => {
+                if(!isEmpty(successCallback)){
+                    successCallback();
+                }
+            };
+            let noSuccessListener = () => {
+                openWindows[0].removeEventListener("popupClosed", successListener);                
+                openWindows[0].removeEventListener("popupClosed", noSuccessListener);                
+            };
 
-function findTopPopup() {
-    var openWindows = document.getElementsByClassName("addPopup");
-    if (openWindows.length <= 0) {
-        //Achievement unlocked, how did we get here
-        return null;
+            openWindows[0].addEventListener("popupClosed", successListener);
+            openWindows[0].addEventListener("popupNotClosed", noSuccessListener);
+            
+            for (let elem of openWindows[0].getElementsByClassName("hover-effect-zoom")) {
+                if (elem.innerHTML === "Abbrechen" || elem.innerHTML === "Schließen" || elem.innerHTML === "✖") {
+                    elem.click();
+                    break;
+                }
+            }
+            break;
+        default:
+            console.error("Zu viele Fenster sind offen, welches soll wann wie geschlossen werden?")
     }
-    var window = document.getElementsByClassName("addPopup")[document.getElementsByClassName("addPopup").length - 1];
-    if (isEmpty(window)) {
-        //Again, how
-        return null;
-    }
-    return window;
 }
 
 // Object.values nachrüsten. 
