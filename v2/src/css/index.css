@@ -60,6 +60,8 @@ body:has(.alert) .content {
 
 .hover-effect-leap-right:hover {
     transform: translate(1rem, 0);
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
 }
 
 .color-inverted {
@@ -203,12 +205,16 @@ body:has(.alert) .content {
 
 .navigation-bar .menu-item .menu-item-header {
     align-items: center;
+    cursor: default;
 }
 
 .navigation-bar .menu-item .menu-item-children {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
     margin-left: 2.5rem;
     flex-direction: column;
+}
+.navigation-bar .menu-item .menu-item-children > div{
+    padding: 0.25em 0;
 }
 
 .navigation-bar .menu-item img {
