@@ -57,13 +57,17 @@ document.addEventListener('DOMContentLoaded', function () {
         // Create new event
         select: function (arg) {
             addShift(arg);
+        },
+
+        eventContent: function( info ) {
+            return {html: info.event.title};
         }
     })
     calendar.render();
 
     let date = new Date('2022/08/22');
     for (let i = 0; i <= 6; i++) {
-        weekDays.push(date.toLocaleDateString("de-DE", {
+        weekDays[i] = new Weekday(i, date.toLocaleDateString("de-DE", {
             weekday: 'long'
         }));
         date.setDate(date.getDate() + 1);
@@ -74,7 +78,6 @@ document.addEventListener('DOMContentLoaded', function () {
         mitarbeiter = Mitarbeiter.marshall(mitarbeiterRaw);
         new xmlHttpRequestHelper("src/php/requestCM.php", "", true, true, (cmsRaw) => {
             cms = CM.marshall(cmsRaw);
-            addShiftPopup();
         });
     });
 });

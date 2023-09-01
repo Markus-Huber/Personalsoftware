@@ -1,31 +1,63 @@
+let shifts = [];
+
 function addShiftPopup(begin, end) {
-    if(isEmpty(begin)){
+    if (isEmpty(begin)) {
         begin = new Date("2023-08-31 12:08:03");
     }
-    if(isEmpty(end)){
+    if (isEmpty(end)) {
         end = new Date();
     }
-    
+
     let shift = new Shift();
     let dirty = false;
 
+    // Werte aus den übergebenen Events übertragen
+    shift.setWeekday(begin.getDate());
+    shift.setBegin(formatTimeHHMM(begin));
+    shift.setEnd(formatTimeHHMM(end));
+
     let parent = new ElementBuilder("div").attribute("id", "schichtplan-neue-schicht").parent(content).cssClass("popup").build();
+
+    let saveFunction = () => {
+        if (isEmpty(shift.getBegin()) || isEmpty(shift.getEnd()) || shift.getMitarbeiter().length < 1 || isEmpty(shift.getWeekday())) {
+            let message = "Die Pflichtfelder:<br>" +
+                (isEmpty(shift.getBegin()) ? "<i>Begin</i><br>" : "") +
+                (isEmpty(shift.getEnd()) ? "<i>Ende</i><br>" : "") +
+                (shift.getMitarbeiter().length < 1 ? "<i>Mitarbeiter eins</i><br>" : "") +
+                (isEmpty(shift.getWeekday()) ? "<i>Wochentag</i><br>" : "") +
+                "dürfen nicht leer sein&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;";
+            showAlert("warning", message, () => {}, () => {}, "OK", "", true);
+            return;
+        }
+        saveShift(shift, begin, end);
+        parent.parentElement.removeChild(parent);
+    }
+
+    let closeFunction = () => closeSomething(dirty, () => parent.parentElement.removeChild(parent));
 
     new ElementBuilder("div").cssClass("popup-header").children(
         new ElementBuilder("h2").children("Schicht planen"),
-        new ElementBuilder("h2").children("✔").title("Speichern").cssProperty("padding", "0 1rem").cssClass("hover-effect-zoom").onclick(() => {
-            saveShift(shift);
-            parent.parentElement.removeChild(parent);
-        }),
-        new ElementBuilder("h2").children("✖").title("Schließen").cssClass("hover-effect-zoom").onclick(() => {
-            closeSomething(dirty, () => parent.parentElement.removeChild(parent));
-        }),
+        new ElementBuilder("h2").children("✔").title("Speichern").cssProperty("padding", "0 1rem").cssClass("hover-effect-zoom").onclick(saveFunction),
+        new ElementBuilder("h2").children("✖").title("Schließen").cssClass("hover-effect-zoom").onclick(closeFunction),
     ).parent(parent).build();
 
+    let weekDaysById = {};
+    weekDays.forEach(weekday => weekDaysById[weekday.getId()] = weekday.getName());
+
+    let initialWeekday = 0;
+    let dayAsString = begin.toLocaleDateString("de-de", {
+        weekday: "long"
+    });
+    weekDays.forEach(weekday => {
+        if (weekday.getName() === dayAsString) {
+            initialWeekday = weekday.getId();
+        }
+    })
+
     let wochentagDropdown = new Dropdown({
-        data: Object.assign({}, weekDays),
-        placeholder: "z.B. " + weekDays[0]
-    }).metaName("wochentag").setValue(weekDays.indexOf(begin.toLocaleDateString("de-de", {weekday: "long"}))).changeListener((event, item) => {
+        data: weekDaysById,
+        placeholder: "z.B. " + weekDaysById[Object.keys(weekDaysById)[0]]
+    }).metaName("wochentag").setValue(initialWeekday).changeListener((event, item) => {
         shift.setWeekday(Object.keys(item)[0]);
         dirty = true;
     });
@@ -33,38 +65,31 @@ function addShiftPopup(begin, end) {
     let mitarbeiterById = {};
     mitarbeiter.forEach(arbeiter => mitarbeiterById[arbeiter.getId()] = arbeiter.resolveName());
 
+    let mitarbeiterValueChange = () => {
+        let mitarbeiter = [].concatIfNotNull(mitarbeiter1Dropdown.getValue())
+            .concatIfNotNull(mitarbeiter2Dropdown.getValue())
+            .concatIfNotNull(mitarbeiter3Dropdown.getValue());
+
+        console.log(mitarbeiter1Dropdown.getValue(), mitarbeiter2Dropdown.getValue(), mitarbeiter3Dropdown.getValue())
+
+        shift.setMitarbeiter(mitarbeiter);
+        dirty = true;
+    };
+
     let mitarbeiter1Dropdown = new Dropdown({
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
-    }).metaName("mitarbeiter").setValue().changeListener((event, item) => {
-        let mitarbeiter = [].concatIfNotNull(Object.keys(item)[0])
-            .concatIfNotNull(mitarbeiter2Dropdown.getValue())
-            .concatIfNotNull(mitarbeiter3Dropdown.getValue());
-        shift.setMitarbeiter(mitarbeiter);
-        dirty = true;
-    });
+    }).metaName("mitarbeiter").setValue().changeListener(mitarbeiterValueChange);
 
     let mitarbeiter2Dropdown = new Dropdown({
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
-    }).metaName("mitarbeiter").setValue().changeListener((event, item) => {
-        let mitarbeiter = [].concatIfNotNull(mitarbeiter1Dropdown.getValue())
-            .concatIfNotNull(Object.keys(item)[0])
-            .concatIfNotNull(mitarbeiter3Dropdown.getValue());
-        shift.setMitarbeiter(mitarbeiter);
-        dirty = true;
-    });
+    }).metaName("mitarbeiter").setValue().changeListener(mitarbeiterValueChange);
 
     let mitarbeiter3Dropdown = new Dropdown({
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
-    }).metaName("mitarbeiter").setValue().changeListener((event, item) => {
-        let mitarbeiter = [].concatIfNotNull(mitarbeiter1Dropdown.getValue())
-            .concatIfNotNull(mitarbeiter2Dropdown.getValue())
-            .concatIfNotNull(Object.keys(item)[0]);
-        shift.setMitarbeiter(mitarbeiter);
-        dirty = true;
-    });
+    }).metaName("mitarbeiter").setValue().changeListener(mitarbeiterValueChange);
 
     let cmsById = {};
     cms.forEach(cm => cmsById[cm.getId()] = cm.getName());
@@ -84,7 +109,7 @@ function addShiftPopup(begin, end) {
                     new ElementBuilder("tr").children(
                         new ElementBuilder("td").children(
                             "Wochentag"
-                        ).cssClass("popup-table-caption"),
+                        ).attribute("required", true).cssClass("popup-table-caption"),
                         new ElementBuilder("td").children(
                             wochentagDropdown.build()
                         )
@@ -92,26 +117,32 @@ function addShiftPopup(begin, end) {
                     new ElementBuilder("tr").children(
                         new ElementBuilder("td").children(
                             "Anfang"
-                        ).cssClass("popup-table-caption"),
+                        ).attribute("required", true).cssClass("popup-table-caption"),
                         new ElementBuilder("td").children(
                             new ElementBuilder("input").attribute("type", "time")
                             .attribute("placeholder", "z.B. 08:00").attribute("value", formatTimeHHMM(begin))
                             .changeListener((event, value) => {
-                                shift.setBegin(value);
-                                dirty = true;
+                                if (/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
+                                    shift.setBegin(value);
+                                    begin.setHours(value.substring(0, 2), value.substring(3, value.length));
+                                    dirty = true;
+                                }
                             })
                         )
                     ),
                     new ElementBuilder("tr").children(
                         new ElementBuilder("td").children(
                             "Ende"
-                        ).cssClass("popup-table-caption"),
+                        ).attribute("required", true).cssClass("popup-table-caption"),
                         new ElementBuilder("td").children(
                             new ElementBuilder("input").attribute("type", "time")
                             .attribute("placeholder", "z.B. 15:30").attribute("value", formatTimeHHMM(end))
                             .changeListener((event, value) => {
-                                shift.setEnd(value);
-                                dirty = true;
+                                if (/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
+                                    shift.setEnd(value);
+                                    end.setHours(value.substring(0, 2), value.substring(3, value.length));
+                                    dirty = true;
+                                }
                             })
                         )
                     ),
@@ -124,7 +155,7 @@ function addShiftPopup(begin, end) {
                     new ElementBuilder("tr").children(
                         new ElementBuilder("td").children(
                             "CM"
-                        ).cssClass("popup-table-caption"),
+                        ).attribute("required", true).cssClass("popup-table-caption"),
                         new ElementBuilder("td").children(
                             cmDropdown.build()
                         )
@@ -132,7 +163,7 @@ function addShiftPopup(begin, end) {
                     new ElementBuilder("tr").children(
                         new ElementBuilder("td").children(
                             "Mitarbeiter 1"
-                        ).cssClass("popup-table-caption"),
+                        ).attribute("required", true).cssClass("popup-table-caption"),
                         new ElementBuilder("td").children(
                             mitarbeiter1Dropdown.build()
                         )
@@ -159,21 +190,25 @@ function addShiftPopup(begin, end) {
     parent.appendChild(parentTable.build());
 
     parent.appendChild(new ElementBuilder("div").cssClass("button-bar").children(
-        new ElementBuilder("button").cssClass("hover-effect-zoom").children("Speichern").onclick(() => {
-            saveShift(shift);
-            parent.parentElement.removeChild(parent);
-        }),
-        new ElementBuilder("button").cssClass("hover-effect-zoom").children("Abbrechen").onclick(() => closeSomething(dirty,
-            () => parent.parentElement.removeChild(parent)
-        ))
+        new ElementBuilder("button").cssClass("hover-effect-zoom").children("Speichern").onclick(saveFunction),
+        new ElementBuilder("button").cssClass("hover-effect-zoom").children("Abbrechen").onclick(closeFunction)
     ).build());
 }
 
-function saveShift(shift) {
+function saveShift(shift, begin, end) {
+    shifts.push(shift);
+    //new xmlHttpRequestHelper("src/php/saveShift.php", "shift=" + JSON.stringify(shift), true, true, (message) => console.log(message));
+
+    let mtbs = [];
+    console.log(shift.getMitarbeiter());
+    shift.getMitarbeiter().forEach(id => {
+        mtbs.push(mitarbeiter[id].resolveShortName());
+    });
+
     calendar.addEvent({
-        title: "Test",
-        start: shift.getBegin(),
-        end: shift.getEnd(),
+        title: Object.values(cms)[shift.getCM()].getName() + "<br />" + mtbs.join(", "),
+        start: begin,
+        end: end,
         allDay: false
     });
 }
@@ -182,11 +217,4 @@ function addShift(addEvent) {
     console.log(addEvent);
     addShiftPopup(new Date(addEvent.startStr), new Date(addEvent.endStr));
     calendar.unselect();
-
-    /*calendar.addEvent({
-        title: "Test",
-        start: addEvent.startStr,
-        end: addEvent.endStr,
-        allDay: false
-    })*/
 }

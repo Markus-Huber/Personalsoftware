@@ -86,3 +86,6 @@ VALUES('Dingolfing');
 
 INSERT INTO employeestandort(employee, standort)
 VALUES (1,1),(2,1);
+
+INSERT INTO shift (isTemplate, isActive, startH, endH, division)
+VALUES (1, 1, "14:45", "23:30", 1);

@@ -43,6 +43,11 @@ body:has(.alert) .content {
     background: rgba(245, 245, 245, 1);
 }
 
+.required{
+    color: mediumvioletred;
+    font-weight: bold;
+}
+
 .hover-effect-zoom,
 .hover-effect-leap-right {
     transition: var(--default-transition);

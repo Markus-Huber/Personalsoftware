@@ -5,6 +5,7 @@ function Dropdown(_config) {
   var m_ChangeListeners = [];
   var parent = document.createElement("div");
   var noValue = true;
+  var currentValue;
   parent.classList.add("combobox");
 
   var isSmall = false;
@@ -12,6 +13,10 @@ function Dropdown(_config) {
   var timeOut;
   var input = document.createElement("input");
   input.addEventListener("change", function (event) {
+    if(isEmpty(this.value)){
+      currentValue = undefined;
+    }
+
     if (!isEmpty(timeOut)) {
       window.clearTimeout(timeOut);
     }
@@ -125,6 +130,7 @@ function Dropdown(_config) {
   for (var i = 0; i < this.listitems.length; i++) {
     // Binding Click Event
     this.listitems[i].onclick = function () {
+      currentValue = this.id.replace("ID_", "");
       var upv = this.innerHTML;
       upv = upv.replace(/\<b\>/ig, '');
       upv = upv.replace(/\<\/b\>/ig, '');
@@ -213,14 +219,14 @@ function Dropdown(_config) {
     if(noValue){
       return null;
     }
-    if (!isEmpty(self.currentitem) && !isEmpty(self.currentitem.id)) {
-      return self.currentitem.id.replace("ID_", "");
+    if (!isEmpty(currentValue)) {
+      return currentValue;
     }
     return null;
   }
 
   this.getValueEx = function () {
-    if (!isEmpty(self.currentitem) && !isEmpty(self.currentitem.id)) {
+    if (!isEmpty(self.getValue())) {
       let item = {};
       item[self.getValue()] = Object.values(children)[self.getValue()];
       return item;
@@ -244,7 +250,7 @@ function Dropdown(_config) {
             upv = upv.replace(/\<b\>/ig, '');
             upv = upv.replace(/\<\/b\>/ig, '');
             input.value = upv;
-
+            currentValue = self.listitems[counter].id.replace("ID_", "");
             break;
           }
         }
@@ -256,6 +262,7 @@ function Dropdown(_config) {
           upv = upv.replace(/\<b\>/ig, '');
           upv = upv.replace(/\<\/b\>/ig, '');
           input.value = upv;
+          currentValue = self.currentitem.id.replace("ID_", "");
         } else {
           findNextMatching();
         }

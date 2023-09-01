@@ -53,16 +53,27 @@ class Shift {
         this._mitarbeiter = [].concat(mitarbeiter);
     }
 
-    getBeginStr(){
-        
-    }
-
     static marshall(data){
         let ret = [];
         Object.values(data).forEach(element => {
             ret.push(new Shift(element["id"], element["weekday"], element["begin"], element["end"], element["cm"]))
         });
         return ret;
+    }
+}
+
+class Weekday {
+    constructor(id, name){
+        this._id = id;
+        this._name = name;
+    }
+
+    getId() {
+        return this._id;
+    }
+
+    getName() {
+        return this._name;
     }
 }
 
@@ -77,7 +88,7 @@ class Mitarbeiter {
     static marshall(data){
         let ret = [];
         Object.values(data).forEach(element => {
-            ret.push(new Mitarbeiter(element["id"], element["workingHours"], element["firstName"], element["lastName"]))
+            ret[element["id"]] = new Mitarbeiter(element["id"], element["workingHours"], element["firstName"], element["lastName"])
         });
         return ret;
     }
@@ -108,6 +119,13 @@ class Mitarbeiter {
             return this._firstName;
         }
         return this._lastName;
+    }
+
+    resolveShortName(){
+        if(!isEmpty(this._lastName)){
+            return this._lastName;
+        }
+        return this._firstName;
     }
 }
 

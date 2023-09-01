@@ -344,7 +344,11 @@ class ElementBuilder {
                         });
                 }
 
-            } else {
+            }
+            else if(_property == "required" && _value){
+                this.m_ChildElement.innerHTML = this.m_ChildElement.innerHTML + "<font class='required'>&nbsp;*</font>";
+            } 
+            else {
                 this.m_ChildElement.setAttribute(_property, isEmpty(_value) ? "" : _value);
             }
         }
@@ -399,7 +403,7 @@ class ElementBuilder {
     }
 }
 
-function showAlert(type, message, okCallback, abortCallback, okMessage = "Akzeptieren", abortMessage = "Abbrechen") {
+function showAlert(type, message, okCallback, abortCallback, okMessage = "Akzeptieren", abortMessage = "Abbrechen", onlyOneButton) {
     for (let i = 0; i < document.getElementsByClassName("alert").length; i++) {
         document.getElementsByClassName("alert")[0].parentElement.removeChild(document.getElementsByClassName("alert")[0]);
     }
@@ -424,7 +428,7 @@ function showAlert(type, message, okCallback, abortCallback, okMessage = "Akzept
                 }
             }
         }),
-        new ElementBuilder("button").children(abortMessage).onclick(() => {
+        onlyOneButton ? null : new ElementBuilder("button").children(abortMessage).onclick(() => {
             if (abortCallback) {
                 abortCallback();
                 for (let i = 0; i < document.getElementsByClassName("alert").length; i++) {
