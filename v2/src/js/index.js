@@ -6,6 +6,8 @@ let defaultShifts = [];
 let mitarbeiter = [];
 let standort = 1;
 let cms = [];
+let workingHours = [];
+let standorte = [];
 
 document.addEventListener('DOMContentLoaded', function () {
     content = document.getElementsByClassName("content")[0];
@@ -13,7 +15,13 @@ document.addEventListener('DOMContentLoaded', function () {
         mitarbeiter = Mitarbeiter.marshall(mitarbeiterRaw);
         new xmlHttpRequestHelper("src/php/requestCM.php", "", true, true, (cmsRaw) => {
             cms = CM.marshall(cmsRaw);
-            showMitarbeiter();
+            new xmlHttpRequestHelper("src/php/requestWorkingHours.php", "", true, true, (wHsRaw) => {
+                workingHours = WorkingHour.marshall(wHsRaw);
+                new xmlHttpRequestHelper("src/php/requestStandorte.php", "", true, true, (standortRaw) => {
+                    standorte = Standort.marshall(standortRaw);
+                    showMitarbeiter();
+                });
+            });
         });
     });
     showShift();

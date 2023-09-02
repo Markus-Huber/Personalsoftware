@@ -26,7 +26,7 @@ CREATE TABLE workinghours (
   id 				int 			NOT NULL 	PRIMARY KEY AUTO_INCREMENT,
   name 				varchar(255) 	NOT NULL,
   isActive 			tinyint 					DEFAULT '1',
-  hours 			time 			NOT NULL
+  hours 			decimal(4,2) 			NOT NULL
 );
 
 create table standort(
@@ -82,10 +82,16 @@ INSERT INTO division(name)
 VALUES('Kasse 1'),('Kasse 2'),('Kasse 3'),('Kasse 4'),('Zureicher'),('TL'),('Reingigung 1'),('Reingigung 2');
 
 INSERT INTO standort(name)
-VALUES('Dingolfing');
+VALUES('Dingolfing'), ('München');
 
 INSERT INTO employeestandort(employee, standort)
 VALUES (1,1),(2,1);
+
+INSERT INTO workingHours (name, hours)
+VALUES("Vollzeit (40h)", 40.0),
+("Teilzeit (20h)", 20.0),
+("Teilzeit (32h)", 20.0),
+("Sonderregelung (flex)", 99.0);
 
 INSERT INTO shift (isTemplate, isActive, startH, endH, division)
 VALUES (1, 1, "14:45", "23:30", 1);

@@ -93,7 +93,7 @@ class Mitarbeiter {
         return ret;
     }
 
-    standorte = [];
+    _standorte = [];
     
     getId() {
         return this._id;
@@ -109,6 +109,10 @@ class Mitarbeiter {
 
     getLastName() {
         return this._lastName;
+    }
+
+    getStandorte(){
+        return this._standorte;
     }
 
     resolveName(){
@@ -147,6 +151,57 @@ class CM {
         let ret = [];
         Object.values(data).forEach(element => {
             ret.push(new CM(element["id"], element["name"]))
+        });
+        return ret;
+    }
+}
+
+class WorkingHour{
+    constructor(id, name, hours) {
+        this._id = id;
+        this._name = name;
+        this._hours = hours;
+    }
+
+    getId() {
+        return this._id;
+    }
+
+    getName() {
+        return this._name;
+    }
+
+    getHours() {
+        return this._hours;
+    }
+
+    static marshall(data){
+        let ret = [];
+        Object.values(data).forEach(element => {
+            ret.push(new WorkingHour(element["id"], element["name"], element["hours"]))
+        });
+        return ret;
+    }    
+}
+
+class Standort {
+    constructor(id, name) {
+        this._id = id;
+        this._name = name;
+    }
+
+    getId() {
+        return this._id;
+    }
+
+    getName() {
+        return this._name;
+    }
+
+    static marshall(data){
+        let ret = [];
+        Object.values(data).forEach(element => {
+            ret.push(new Standort(element["id"], element["name"]))
         });
         return ret;
     }
