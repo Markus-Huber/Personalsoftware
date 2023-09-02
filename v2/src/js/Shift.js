@@ -1,6 +1,6 @@
 let shifts = [];
 
-function showShift(){
+function showShift() {
     content.innerHTML = null;
     new ElementBuilder("div").parent(content).id("schichtplan-creator").build();
 
@@ -53,8 +53,50 @@ function showShift(){
             addShift(arg);
         },
 
-        eventContent: function( info ) {
-            return {html: info.event.title};
+        eventContent: function (info) {
+            return {
+                html: info.event.title
+            };
+        },
+        eventAdd: (idk) => {
+            console.log("eventAdd", idk);
+            let dayColumns = document.getElementById("schichtplan-creator").getElementsByClassName("fc-timegrid-col");
+            for (let dayColumn of dayColumns) {
+                let dates = dayColumn.getElementsByClassName("fc-timegrid-event-harness");
+                if (dates.length > 1) {
+                    let elementsToAdjust = [];
+                    let width;
+                    let highestNumberOfOverlaps = 0;
+
+                    for (let date of dates) {
+                        console.log(date);
+                        let numberOfOverlaps = 1;
+                        for (let date2 of dates) {
+                            if (date != date2) {
+                                if (elementsOverlap(date, date2)) {
+                                    console.log("overlap");
+                                    numberOfOverlaps++;
+                                }
+                            }
+                        }
+                        if (numberOfOverlaps > 1) {
+                            if (highestNumberOfOverlaps < numberOfOverlaps) {
+                                highestNumberOfOverlaps = numberOfOverlaps;
+                                width = ((100 / numberOfOverlaps) - 10) + "%";
+                            }
+                            elementsToAdjust.push(date);
+                        }
+                    }
+                    if (!isEmpty(width)) {
+                        for (let elemToAdjust of elementsToAdjust) {
+                            elemToAdjust.style.maxWidth = width;
+                            if (!isTextFitting(elemToAdjust)) {
+                                elemToAdjust.classList.add("fc-timegrid-event-harness-vertical-text")
+                            }
+                        }
+                    }
+                }
+            };
         }
     })
     calendar.render();
@@ -145,8 +187,6 @@ function addShiftPopup(begin, end) {
         let mitarbeiter = [].concatIfNotNull(mitarbeiter1Dropdown.getValue())
             .concatIfNotNull(mitarbeiter2Dropdown.getValue())
             .concatIfNotNull(mitarbeiter3Dropdown.getValue());
-
-        console.log(mitarbeiter1Dropdown.getValue(), mitarbeiter2Dropdown.getValue(), mitarbeiter3Dropdown.getValue())
 
         shift.setMitarbeiter(mitarbeiter);
         dirty = true;
@@ -276,7 +316,6 @@ function saveShift(shift, begin, end) {
     //new xmlHttpRequestHelper("src/php/saveShift.php", "shift=" + JSON.stringify(shift), true, true, (message) => console.log(message));
 
     let mtbs = [];
-    console.log(shift.getMitarbeiter());
     shift.getMitarbeiter().forEach(id => {
         mtbs.push(mitarbeiter[id].resolveShortName());
     });
@@ -290,7 +329,6 @@ function saveShift(shift, begin, end) {
 }
 
 function addShift(addEvent) {
-    console.log(addEvent);
     addShiftPopup(new Date(addEvent.startStr), new Date(addEvent.endStr));
     calendar.unselect();
 }

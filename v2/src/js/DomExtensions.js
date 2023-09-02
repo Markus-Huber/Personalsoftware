@@ -130,6 +130,22 @@ function xmlHttpRequestHelper(requestURL, params, isPost, isAsync, successCallba
     }
 }
 
+function elementsOverlap(el1, el2) {
+    var rect1 = el1.getBoundingClientRect();
+    var rect2 = el2.getBoundingClientRect();
+
+    return !(
+        rect1.top > rect2.bottom ||
+        rect1.right < rect2.left ||
+        rect1.bottom < rect2.top ||
+        rect1.left > rect2.right
+    );
+}
+
+function isTextFitting(element){
+    return element.scrollWidth > element.getBoundingClientRect().width;
+}
+
 /**
  * Nimmt eine Form von HTML Iterable, wie einen Dom- Childlist und wandelt sie in einen statischen Array um.
  * Diese Methode existiert da zum Beispiel eine Liste von Kind- Elementen dynamisch ist und es zu 

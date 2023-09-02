@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 workingHours = WorkingHour.marshall(wHsRaw);
                 new xmlHttpRequestHelper("src/php/requestStandorte.php", "", true, true, (standortRaw) => {
                     standorte = Standort.marshall(standortRaw);
-                    showMitarbeiter();
                 });
             });
         });
