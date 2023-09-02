@@ -322,6 +322,7 @@ function saveShift(shift, begin, end) {
 
     calendar.addEvent({
         title: Object.values(cms)[shift.getCM()].getName() + "<br />" + mtbs.join(", "),
+        backgroundColor: Object.values(cms)[shift.getCM()].getColor(),
         start: begin,
         end: end,
         allDay: false

@@ -10,7 +10,7 @@
             $arr = [];
             while ($row = $result->fetch_assoc()) 
             {
-                $jsonArrayObject = (array('id' => $row["id"], 'name' => $row["name"]));
+                $jsonArrayObject = (array('id' => $row["id"], 'name' => $row["name"], 'color' => $row["color"]));
                 $arr[$row["id"]] = $jsonArrayObject;
             }
             $json_array = json_encode($arr);

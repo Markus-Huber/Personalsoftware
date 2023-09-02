@@ -5,6 +5,7 @@ USE shiftScheduler;
 CREATE TABLE division(
 	id 				int 			NOT NULL 	PRIMARY KEY AUTO_INCREMENT,
 	name 			varchar(255) 	NOT NULL,
+  color     varchar(255) NULL,
 	isActive 		tinyint 					DEFAULT '1'
 );
 
@@ -78,8 +79,8 @@ CREATE TABLE employeeswitchedshift (
 INSERT INTO employee (isAdmin, firstName, lastName)
 VALUES (1,NULL,'HUM'),(0,'Max','Mustermann');
 
-INSERT INTO division(name)
-VALUES('Kasse 1'),('Kasse 2'),('Kasse 3'),('Kasse 4'),('Zureicher'),('TL'),('Reingigung 1'),('Reingigung 2');
+INSERT INTO division(name, color)
+VALUES('Kasse 1', '#006400'),('Kasse 2','#556B2F'),('Kasse 3','#C0FF3E'),('Kasse 4', '#CAFF70'),('Zureicher','#FFA500'),('TL','#FAFAD2'),('Reingigung 1', '#104E8B'),('Reingigung 2','#6495ED');
 
 INSERT INTO standort(name)
 VALUES('Dingolfing'), ('München');

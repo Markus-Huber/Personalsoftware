@@ -134,9 +134,10 @@ class Mitarbeiter {
 }
 
 class CM {
-    constructor(id, name) {
+    constructor(id, name, color) {
         this._id = id;
         this._name = name;
+        this._color = color;
     }
 
     getId() {
@@ -147,10 +148,14 @@ class CM {
         return this._name;
     }
 
+    getColor() {
+        return this._color;
+    }
+
     static marshall(data){
         let ret = [];
         Object.values(data).forEach(element => {
-            ret.push(new CM(element["id"], element["name"]))
+            ret.push(new CM(element["id"], element["name"], element["color"]))
         });
         return ret;
     }
