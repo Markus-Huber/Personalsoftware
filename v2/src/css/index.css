@@ -305,7 +305,11 @@ menu-item-header .open-close-icon {
     }
 }
 
-#schichtplan-neue-schicht {
+.popup {
+    padding: 2rem;
+    color: var(--opacity-black-color);
+    overflow: auto;
+
     background-color: #cdcdcd;
     position: fixed;
     z-index: 100;
@@ -319,12 +323,6 @@ menu-item-header .open-close-icon {
     left: calc(20vw + 2vh + 2rem);
     height: calc(100vh - 11vh - 7rem);
     width: calc(100vw - calc(20vw + 3vh) - 4rem);
-}
-
-.popup {
-    padding: 2rem;
-    color: var(--opacity-black-color);
-    overflow: auto;
 }
 
 .popup h2 {
