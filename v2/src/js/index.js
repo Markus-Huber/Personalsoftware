@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', function () {
         mitarbeiter = Mitarbeiter.marshall(mitarbeiterRaw);
         new xmlHttpRequestHelper("src/php/requestCM.php", "", true, true, (cmsRaw) => {
             cms = CM.marshall(cmsRaw);
+            // Wir brauchen die CMS, um die Schichten zu laden und zu rendern
+            showShift();
+
             new xmlHttpRequestHelper("src/php/requestWorkingHours.php", "", true, true, (wHsRaw) => {
                 workingHours = WorkingHour.marshall(wHsRaw);
                 new xmlHttpRequestHelper("src/php/requestStandorte.php", "", true, true, (standortRaw) => {
@@ -23,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
-    showShift();
 });
 
 function closeSomething(dirty, yesCallback, noCallback) {

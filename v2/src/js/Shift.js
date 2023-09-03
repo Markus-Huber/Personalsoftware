@@ -1,4 +1,5 @@
 let shifts = [];
+let fromTills = [];
 
 function showShift() {
     content.innerHTML = null;
@@ -65,51 +66,39 @@ function showShift() {
             }
         },
         datesSet: (evt) => {
-            let begin = formatDate(new Date(evt.start));
-            let end = new Date(evt.end);
-            end.setDate(end.getDate() -1);
-            end = formatDate(end);
+            let from = formatDate(new Date(evt.start));
+            let till = new Date(evt.end);
+            till.setDate(till.getDate() - 1);
+            till = formatDate(till);
 
-            console.log(begin, end);
-            new xmlHttpRequestHelper("src/php/requestShift.php", "begin=" + begin + "&end="+end, true, true, (message) => console.log(message));
+            if(fromTills[from + till]){
+                checkOverlap();
+                return;
+            }
+            new xmlHttpRequestHelper("src/php/requestShift.php", "from=" + from + "&till=" + till, true, true, (shiftsRaw) => {
+                shifts = Shift.marshall(shiftsRaw);
+                fromTills[from + till] = true;
+                shifts.forEach(shift => {
+                    let mtbs = [];
+                    shift.getMitarbeiter().forEach(id => {
+                        mtbs.push(mitarbeiter[id].resolveName());
+                    });
+                    let cm = cms[shift.getCM()];
 
+                    calendar.addEvent({
+                        id: getUniqueid(),
+                        title: cm.getName() + "<br />" + mtbs.join(", "),
+                        backgroundColor: cm.getColor(),
+                        textColor: isHexColorLight(cm.getColor()) ? "black" : "white",
+                        start: new Date(shift.getReferenceDate() + "T" + shift.getBegin()),
+                        end: new Date(shift.getReferenceDate() + "T" + shift.getEnd()),
+                        allDay: false
+                    });
+                });
+            });
         },
         eventAdd: () => {
-            let dayColumns = document.getElementById("schichtplan-creator").getElementsByClassName("fc-timegrid-col");
-            for (let dayColumn of dayColumns) {
-                let dates = dayColumn.getElementsByClassName("fc-timegrid-event-harness");
-                if (dates.length > 1) {
-                    let elementsToAdjust = [];
-                    let width;
-                    let highestNumberOfOverlaps = 0;
-
-                    for (let date of dates) {
-                        let numberOfOverlaps = 1;
-                        for (let date2 of dates) {
-                            if (date != date2) {
-                                if (calendarDatesOverlap(date, date2)) {
-                                    numberOfOverlaps++;
-                                }
-                            }
-                        }
-                        if (numberOfOverlaps > 1) {
-                            if (highestNumberOfOverlaps < numberOfOverlaps) {
-                                highestNumberOfOverlaps = numberOfOverlaps;
-                                width = ((100 / numberOfOverlaps) - 10) + "%";
-                            }
-                            elementsToAdjust.push(date);
-                        }
-                    }
-                    if (!isEmpty(width)) {
-                        for (let elemToAdjust of elementsToAdjust) {
-                            elemToAdjust.style.maxWidth = width;
-                            if (!isTextFitting(elemToAdjust)) {
-                                elemToAdjust.classList.add("fc-timegrid-event-harness-vertical-text")
-                            }
-                        }
-                    }
-                }
-            };
+            checkOverlap();
         }
     })
     calendar.render();
@@ -122,6 +111,48 @@ function showShift() {
         date.setDate(date.getDate() + 1);
     }
     weekDays = weekDays.slice(startDayOfShift - 1).concat(weekDays.slice(0, startDayOfShift - 1));
+}
+
+function addCalendarEvent(shift){
+    
+}
+
+function checkOverlap(){
+    let dayColumns = document.getElementById("schichtplan-creator").getElementsByClassName("fc-timegrid-col");
+    for (let dayColumn of dayColumns) {
+        let dates = dayColumn.getElementsByClassName("fc-timegrid-event-harness");
+        if (dates.length > 1) {
+            let elementsToAdjust = [];
+            let width;
+            let highestNumberOfOverlaps = 0;
+
+            for (let date of dates) {
+                let numberOfOverlaps = 1;
+                for (let date2 of dates) {
+                    if (date != date2) {
+                        if (calendarDatesOverlap(date, date2)) {
+                            numberOfOverlaps++;
+                        }
+                    }
+                }
+                if (numberOfOverlaps > 1) {
+                    if (highestNumberOfOverlaps < numberOfOverlaps) {
+                        highestNumberOfOverlaps = numberOfOverlaps;
+                        width = ((100 / numberOfOverlaps) - 10) + "%";
+                    }
+                    elementsToAdjust.push(date);
+                }
+            }
+            if (!isEmpty(width)) {
+                for (let elemToAdjust of elementsToAdjust) {
+                    elemToAdjust.style.maxWidth = width;
+                    if (!isTextFitting(elemToAdjust)) {
+                        elemToAdjust.classList.add("fc-timegrid-event-harness-vertical-text")
+                    }
+                }
+            }
+        }
+    };
 }
 
 function addShiftPopup(begin, end, shift) {

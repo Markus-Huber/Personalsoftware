@@ -1,13 +1,14 @@
 class Shift {
-    _mitarbeiter = [];
-    _referenceDate;
 
-    constructor(id, weekday, begin, end, cm) {
+    constructor(id, weekday, begin, end, cm, mitarbeiter, referenceDate) {
         this._id = id;
         this._weekday = weekday;
         this._begin = begin;
         this._end = end;
         this._cm = cm;
+        this._mitarbeiter = [];
+        this.setMitarbeiter(mitarbeiter);
+        this._referenceDate = referenceDate;
     }
 
     getId() {
@@ -50,18 +51,31 @@ class Shift {
         this._referenceDate = referenceDate;
     }
 
+    getReferenceDate() {
+        return this._referenceDate;
+    }
+
     getMitarbeiter() {
         return this._mitarbeiter;
     }
 
     setMitarbeiter(mitarbeiter) {
-        this._mitarbeiter = [].concat(mitarbeiter);
+        this._mitarbeiter = [].concatIfNotNull(mitarbeiter);
     }
 
     static marshall(data) {
         let ret = [];
         Object.values(data).forEach(element => {
-            ret[element["id"]] = new Shift(element["id"], element["weekday"], element["begin"], element["end"], element["cm"]);
+            let mitarbeiter = element["mitarbeiter"];
+            if(!isEmpty(mitarbeiter)){
+                mitarbeiter = mitarbeiter.split(",");
+            };
+            let weekday = element["weekday"];
+            if(isEmpty(weekday) && !isEmpty(element["referenceDate"])){
+                weekday = new Date(element["referenceDate"]).getDay();
+            }
+
+            ret[element["id"]] = new Shift(element["id"], weekday, element["begin"], element["end"], element["cm"], mitarbeiter, element["referenceDate"]);
         });
         return ret;
     }
