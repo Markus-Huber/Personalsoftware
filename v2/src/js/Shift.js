@@ -58,11 +58,21 @@ function showShift() {
                 html: info.event.title
             };
         },
-        eventClick: function(info) {
-            if(info.jsEvent.detail == 2){
+        eventClick: function (info) {
+            if (info.jsEvent.detail == 2) {
                 addShiftPopup(new Date(info.event._instance.range.start), new Date(info.event._instance.range.end));
                 //info.event.remove();
             }
+        },
+        datesSet: (evt) => {
+            let begin = formatDate(new Date(evt.start));
+            let end = new Date(evt.end);
+            end.setDate(end.getDate() -1);
+            end = formatDate(end);
+
+            console.log(begin, end);
+            new xmlHttpRequestHelper("src/php/requestShift.php", "begin=" + begin + "&end="+end, true, true, (message) => console.log(message));
+
         },
         eventAdd: () => {
             let dayColumns = document.getElementById("schichtplan-creator").getElementsByClassName("fc-timegrid-col");
@@ -121,7 +131,7 @@ function addShiftPopup(begin, end, shift) {
     if (isEmpty(end)) {
         end = new Date();
     }
-    if(isEmpty(shift)){
+    if (isEmpty(shift)) {
         shift = new Shift();
     }
     let dirty = false;
@@ -323,10 +333,10 @@ function saveShift(shift, begin, end) {
     shift.getMitarbeiter().forEach(id => {
         mtbs.push(mitarbeiter[id].resolveName());
     });
-    let cm =  cms[shift.getCM()];
+    let cm = cms[shift.getCM()];
     calendar.addEvent({
         id: getUniqueid(),
-        title:cm.getName() + "<br />" + mtbs.join(", "),
+        title: cm.getName() + "<br />" + mtbs.join(", "),
         backgroundColor: cm.getColor(),
         textColor: isHexColorLight(cm.getColor()) ? "black" : "white",
         start: begin,
