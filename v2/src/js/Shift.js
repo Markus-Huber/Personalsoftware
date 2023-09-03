@@ -73,7 +73,7 @@ function showShift() {
                         let numberOfOverlaps = 1;
                         for (let date2 of dates) {
                             if (date != date2) {
-                                if (elementsOverlap(date, date2)) {
+                                if (calendarDatesOverlap(date, date2)) {
                                     console.log("overlap");
                                     numberOfOverlaps++;
                                 }
@@ -209,7 +209,6 @@ function addShiftPopup(begin, end) {
 
     let cmsById = {};
     cms.forEach(cm => cmsById[cm.getId()] = cm.getName());
-
     let cmDropdown = new Dropdown({
         data: cmsById,
         placeholder: "z.B. Kasse 1"
@@ -319,10 +318,11 @@ function saveShift(shift, begin, end) {
     shift.getMitarbeiter().forEach(id => {
         mtbs.push(mitarbeiter[id].resolveShortName());
     });
-
+    let cm =  cms[shift.getCM()];
     calendar.addEvent({
-        title: Object.values(cms)[shift.getCM()].getName() + "<br />" + mtbs.join(", "),
-        backgroundColor: Object.values(cms)[shift.getCM()].getColor(),
+        title:cm.getName() + "<br />" + mtbs.join(", "),
+        backgroundColor: cm.getColor(),
+        textColor: isHexColorLight(cm.getColor()) ? "black" : "white",
         start: begin,
         end: end,
         allDay: false

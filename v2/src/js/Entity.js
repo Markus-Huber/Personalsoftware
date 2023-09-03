@@ -37,7 +37,7 @@ class Shift {
         this._end = end;
     }
 
-    getCM(){
+    getCM() {
         return this._cm;
     }
 
@@ -45,25 +45,25 @@ class Shift {
         this._cm = cm;
     }
 
-    getMitarbeiter(){
+    getMitarbeiter() {
         return this._mitarbeiter;
     }
 
-    setMitarbeiter(mitarbeiter){
+    setMitarbeiter(mitarbeiter) {
         this._mitarbeiter = [].concat(mitarbeiter);
     }
 
-    static marshall(data){
+    static marshall(data) {
         let ret = [];
         Object.values(data).forEach(element => {
-            ret.push(new Shift(element["id"], element["weekday"], element["begin"], element["end"], element["cm"]))
+            ret[element["id"]] = new Shift(element["id"], element["weekday"], element["begin"], element["end"], element["cm"]);
         });
         return ret;
     }
 }
 
 class Weekday {
-    constructor(id, name){
+    constructor(id, name) {
         this._id = id;
         this._name = name;
     }
@@ -78,23 +78,15 @@ class Weekday {
 }
 
 class Mitarbeiter {
-    constructor(id, workingHours, firstName, lastName){
+    constructor(id, workingHours, firstName, lastName) {
         this._id = id;
         this._workingHours = workingHours;
         this._firstName = firstName;
         this._lastName = lastName;
     }
 
-    static marshall(data){
-        let ret = [];
-        Object.values(data).forEach(element => {
-            ret[element["id"]] = new Mitarbeiter(element["id"], element["workingHours"], element["firstName"], element["lastName"])
-        });
-        return ret;
-    }
-
     _standorte = [];
-    
+
     getId() {
         return this._id;
     }
@@ -111,13 +103,13 @@ class Mitarbeiter {
         return this._lastName;
     }
 
-    getStandorte(){
+    getStandorte() {
         return this._standorte;
     }
 
-    resolveName(){
-        if(!isEmpty(this._firstName)){
-            if(!isEmpty(this._lastName)){
+    resolveName() {
+        if (!isEmpty(this._firstName)) {
+            if (!isEmpty(this._lastName)) {
                 return this._firstName + " " + this._lastName;
             }
             return this._firstName;
@@ -125,11 +117,19 @@ class Mitarbeiter {
         return this._lastName;
     }
 
-    resolveShortName(){
-        if(!isEmpty(this._lastName)){
+    resolveShortName() {
+        if (!isEmpty(this._lastName)) {
             return this._lastName;
         }
         return this._firstName;
+    }
+
+    static marshall(data) {
+        let ret = [];
+        Object.values(data).forEach(element => {
+            ret[element["id"]] = new Mitarbeiter(element["id"], element["workingHours"], element["firstName"], element["lastName"])
+        });
+        return ret;
     }
 }
 
@@ -152,16 +152,16 @@ class CM {
         return this._color;
     }
 
-    static marshall(data){
+    static marshall(data) {
         let ret = [];
         Object.values(data).forEach(element => {
-            ret.push(new CM(element["id"], element["name"], element["color"]))
+            ret[element["id"]] = new CM(element["id"], element["name"], element["color"]);
         });
         return ret;
     }
 }
 
-class WorkingHour{
+class WorkingHour {
     constructor(id, name, hours) {
         this._id = id;
         this._name = name;
@@ -180,13 +180,13 @@ class WorkingHour{
         return this._hours;
     }
 
-    static marshall(data){
+    static marshall(data) {
         let ret = [];
         Object.values(data).forEach(element => {
-            ret.push(new WorkingHour(element["id"], element["name"], element["hours"]))
+            ret[element["id"]] = new WorkingHour(element["id"], element["name"], element["hours"]);
         });
         return ret;
-    }    
+    }
 }
 
 class Standort {
@@ -203,10 +203,10 @@ class Standort {
         return this._name;
     }
 
-    static marshall(data){
+    static marshall(data) {
         let ret = [];
         Object.values(data).forEach(element => {
-            ret.push(new Standort(element["id"], element["name"]))
+            ret[element["id"]] = new Standort(element["id"], element["name"]);
         });
         return ret;
     }

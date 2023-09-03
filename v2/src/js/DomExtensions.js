@@ -130,9 +130,14 @@ function xmlHttpRequestHelper(requestURL, params, isPost, isAsync, successCallba
     }
 }
 
-function elementsOverlap(el1, el2) {
+function calendarDatesOverlap(el1, el2) {
     var rect1 = el1.getBoundingClientRect();
     var rect2 = el2.getBoundingClientRect();
+    
+    if(rect1.top == rect2.bottom || rect1.bottom == rect2.bottom){
+        // sie berühren sich nur exakt und sind untereinander
+        return false;
+    }
 
     return !(
         rect1.top > rect2.bottom ||
@@ -140,6 +145,15 @@ function elementsOverlap(el1, el2) {
         rect1.bottom < rect2.top ||
         rect1.left > rect2.right
     );
+}
+
+function isHexColorLight(color) {
+    const hex = color.replace('#', '');
+    const c_r = parseInt(hex.substr(0, 2), 16);
+    const c_g = parseInt(hex.substr(2, 2), 16);
+    const c_b = parseInt(hex.substr(4, 2), 16);
+    const brightness = ((c_r * 299) + (c_g * 587) + (c_b * 114)) / 1000;
+    return brightness > 155;
 }
 
 function isTextFitting(element){

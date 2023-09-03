@@ -22,7 +22,8 @@ function Dropdown(_config) {
     }
     timeOut = window.setTimeout(() => {
       let item = {};
-      item[self.getValue()] = Object.values(children)[self.getValue()];
+      item[self.getValue()] = children[self.getValue()];
+      console.log(item);
 
       for (var i = 0; i < m_ChangeListeners.length; i++) {
         m_ChangeListeners[i](event, item);
