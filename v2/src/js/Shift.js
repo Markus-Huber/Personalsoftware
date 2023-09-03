@@ -315,8 +315,9 @@ function addShiftPopup(begin, end, shift) {
 }
 
 function saveShift(shift, begin, end) {
+    shift.setReferenceDate(formatDate(begin));
     shifts.push(shift);
-    //new xmlHttpRequestHelper("src/php/saveShift.php", "shift=" + JSON.stringify(shift), true, true, (message) => console.log(message));
+    new xmlHttpRequestHelper("src/php/saveShift.php", "shift=" + JSON.stringify(shift), true, true, (message) => console.log(message));
 
     let mtbs = [];
     shift.getMitarbeiter().forEach(id => {

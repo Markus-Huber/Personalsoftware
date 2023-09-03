@@ -191,8 +191,8 @@ function formatTimeHHMM(date){
 
 function formatDate(date) {
     var aktDate = !isEmpty(date) ? date : new Date();
-    var day = (aktDate.getDate() + "0").length > 1 ? aktDate.getDate() : "0" + aktDate.getDate();
-    var month = (aktDate.getMonth() + "1").length > 1 ? (aktDate.getMonth() + 1) : "0" + (aktDate.getMonth() + 1);
+    var day = (aktDate.getDate() + "0").length > 2 ? aktDate.getDate() : "0" + aktDate.getDate();
+    var month = (aktDate.getMonth() + "0").length > 2 ? (aktDate.getMonth() + 1) : "0" + (aktDate.getMonth() + 1);
     var date = aktDate.getFullYear() + "-" + month + "-" + day;
 
     return date;

@@ -16,7 +16,7 @@ CREATE TABLE shift (
   startH 			time 			NOT NULL,
   endH 				time 			NOT NULL,
   breakIncluded 	tinyint 					DEFAULT '0',
-  breakH 			time 			NOT NULL,
+  breakH 			time 			NULL      DEFAULT '0.0',
   scheduledDate 	date 			NULL,
   division			int				NULL,
   

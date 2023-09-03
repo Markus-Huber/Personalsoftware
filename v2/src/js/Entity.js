@@ -1,5 +1,6 @@
 class Shift {
     _mitarbeiter = [];
+    _referenceDate;
 
     constructor(id, weekday, begin, end, cm) {
         this._id = id;
@@ -43,6 +44,10 @@ class Shift {
 
     setCM(cm) {
         this._cm = cm;
+    }
+
+    setReferenceDate(referenceDate) {
+        this._referenceDate = referenceDate;
     }
 
     getMitarbeiter() {
