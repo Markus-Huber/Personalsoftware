@@ -117,13 +117,13 @@
     }
 
     to {
-        max-height: 45vh;
+        max-height: calc(5 * 43px);
     }
 }
 
 @keyframes close-combobox {
     from {
-        max-height: 45vh;
+        max-height: calc(5 * 43px);
     }
 
     to {

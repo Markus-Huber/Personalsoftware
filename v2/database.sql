@@ -41,8 +41,8 @@ CREATE TABLE employee (
   isActive			tinyint 					DEFAULT '1',
   loginCounter		int 						DEFAULT '0',
   workingHours 		int 			NULL,
-  firstName 		varchar(255) 	NULL,
-  lastName 			varchar(255) 	NOT NULL,
+  firstName 		varchar(255) 	NOT NULL,
+  lastName 			varchar(255) 	NULL,
   
   FOREIGN KEY (workingHours) 		REFERENCES workinghours(id)
 );
@@ -76,8 +76,14 @@ CREATE TABLE employeeswitchedshift (
   FOREIGN KEY (newEmployee) 		REFERENCES employee (id)
 );
 
-INSERT INTO employee (isAdmin, firstName, lastName)
-VALUES (1,NULL,'HUM'),(0,'Max','Mustermann');
+INSERT INTO employee (isAdmin, firstName)
+VALUES (1,'HUM'),(1,'Bernhard');
+INSERT INTO employee (firstName)
+VALUES ('Bianca');
+INSERT INTO employee (firstName, lastName)
+VALUES ('Jessica','T');
+INSERT INTO employee (firstName)
+VALUES ('Alili'),('Mikolaj'),('Sophia'),('Joel'),('Sina'),('Haack'),('Monika'),('Kevin'),('Wimberger');
 
 INSERT INTO division(name, color)
 VALUES('Kasse 1', '#006400'),('Kasse 2','#556B2F'),('Kasse 3','#C0FF3E'),('Kasse 4', '#CAFF70'),('Zureicher','#FFA500'),('TL','#FAFAD2'),('Reingigung 1', '#104E8B'),('Reingigung 2','#6495ED');
@@ -86,7 +92,7 @@ INSERT INTO standort(name)
 VALUES('Dingolfing'), ('München');
 
 INSERT INTO employeestandort(employee, standort)
-VALUES (1,1),(2,1);
+SELECT id, 1 from employee;
 
 INSERT INTO workingHours (name, hours)
 VALUES("Vollzeit (40h)", 40.0),
@@ -94,5 +100,6 @@ VALUES("Vollzeit (40h)", 40.0),
 ("Teilzeit (32h)", 20.0),
 ("Sonderregelung (flex)", 99.0);
 
-INSERT INTO shift (isTemplate, isActive, startH, endH, division)
+/*INSERT INTO shift (isTemplate, isActive, startH, endH, division)
 VALUES (1, 1, "14:45", "23:30", 1);
+*/
