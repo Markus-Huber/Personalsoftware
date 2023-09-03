@@ -58,8 +58,13 @@ function showShift() {
                 html: info.event.title
             };
         },
-        eventAdd: (idk) => {
-            console.log("eventAdd", idk);
+        eventClick: function(info) {
+            if(info.jsEvent.detail == 2){
+                addShiftPopup(new Date(info.event._instance.range.start), new Date(info.event._instance.range.end));
+                //info.event.remove();
+            }
+        },
+        eventAdd: () => {
             let dayColumns = document.getElementById("schichtplan-creator").getElementsByClassName("fc-timegrid-col");
             for (let dayColumn of dayColumns) {
                 let dates = dayColumn.getElementsByClassName("fc-timegrid-event-harness");
@@ -69,12 +74,10 @@ function showShift() {
                     let highestNumberOfOverlaps = 0;
 
                     for (let date of dates) {
-                        console.log(date);
                         let numberOfOverlaps = 1;
                         for (let date2 of dates) {
                             if (date != date2) {
                                 if (calendarDatesOverlap(date, date2)) {
-                                    console.log("overlap");
                                     numberOfOverlaps++;
                                 }
                             }
@@ -111,15 +114,16 @@ function showShift() {
     weekDays = weekDays.slice(startDayOfShift - 1).concat(weekDays.slice(0, startDayOfShift - 1));
 }
 
-function addShiftPopup(begin, end) {
+function addShiftPopup(begin, end, shift) {
     if (isEmpty(begin)) {
         begin = new Date("2023-08-31 12:08:03");
     }
     if (isEmpty(end)) {
         end = new Date();
     }
-
-    let shift = new Shift();
+    if(isEmpty(shift)){
+        shift = new Shift();
+    }
     let dirty = false;
 
     // Werte aus den übergebenen Events übertragen
@@ -316,10 +320,11 @@ function saveShift(shift, begin, end) {
 
     let mtbs = [];
     shift.getMitarbeiter().forEach(id => {
-        mtbs.push(mitarbeiter[id].resolveShortName());
+        mtbs.push(mitarbeiter[id].resolveName());
     });
     let cm =  cms[shift.getCM()];
     calendar.addEvent({
+        id: getUniqueid(),
         title:cm.getName() + "<br />" + mtbs.join(", "),
         backgroundColor: cm.getColor(),
         textColor: isHexColorLight(cm.getColor()) ? "black" : "white",

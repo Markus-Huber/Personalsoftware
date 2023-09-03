@@ -83,7 +83,7 @@ VALUES ('Bianca');
 INSERT INTO employee (firstName, lastName)
 VALUES ('Jessica','T');
 INSERT INTO employee (firstName)
-VALUES ('Alili'),('Mikolaj'),('Sophia'),('Joel'),('Sina'),('Haack'),('Monika'),('Kevin'),('Wimberger');
+VALUES ('Alili'),('Mikolaj'),('Sophia'),('Joel'),('Sina'),('Haack'),('Monika'),('Kevin'),('Wimberger','Kostorz');
 
 INSERT INTO division(name, color)
 VALUES('Kasse 1', '#006400'),('Kasse 2','#556B2F'),('Kasse 3','#C0FF3E'),('Kasse 4', '#CAFF70'),('Zureicher','#FFA500'),('TL','#FAFAD2'),('Reingigung 1', '#104E8B'),('Reingigung 2','#6495ED');

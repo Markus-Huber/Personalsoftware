@@ -91,6 +91,10 @@ const toAlpha = (num) => {
     return String.fromCharCode(num + leveller);
 };
 
+function getUniqueid() {
+    return Date.now().toString(36) + Math.floor(Math.pow(10, 12) + Math.random() * 9*Math.pow(10, 12)).toString(36);
+}
+
 function xmlHttpRequestHelper(requestURL, params, isPost, isAsync, successCallback, errorCallback) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open(isPost ? "POST" : "GET", requestURL, isAsync);
@@ -134,7 +138,7 @@ function calendarDatesOverlap(el1, el2) {
     var rect1 = el1.getBoundingClientRect();
     var rect2 = el2.getBoundingClientRect();
     
-    if(rect1.top == rect2.bottom || rect1.bottom == rect2.bottom){
+    if(rect1.top == rect2.bottom || rect1.bottom == rect2.top){
         // sie berühren sich nur exakt und sind untereinander
         return false;
     }
