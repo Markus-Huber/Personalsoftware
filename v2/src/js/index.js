@@ -28,9 +28,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-function closeSomething(dirty, yesCallback, noCallback) {
+function closeSomething(dirty, yesCallback, noCallback, isEdit) {
     if (dirty) {
-        showAlert("warning", "Es sind bereits Daten eingegeben, <br>wollen Sie diesen Eintrag wirklich verwerfen?", true, yesCallback, noCallback, "Ja", "Nein")
+        showAlert("warning",isEdit ? "Sie haben bereits Daten verändert<br> Wollen Sie ihre Änderrungen wirklich verwerfen?" :"Es sind bereits Daten eingegeben, <br>wollen Sie diesen Eintrag wirklich verwerfen?", true, yesCallback, noCallback, "Ja", "Nein")
         return;
     }
     yesCallback();

@@ -187,7 +187,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
             showAlert("warning", message, true, () => {}, () => {}, "OK", "", true);
             return;
         }
-        saveShift(shift, begin, end);
+        saveShift(shift, begin, end, isEdit);
         parent.parentElement.removeChild(parent);
     }
 
@@ -198,7 +198,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
     }, () => {
         const event = new Event("popupNotClosed");
         parent.dispatchEvent(event);
-    });
+    }, isEdit);
 
     new ElementBuilder("div").cssClass("popup-header").children(
         new ElementBuilder("h2").children("Schicht " + (isEdit ? "bearbeiten" : "planen")),
@@ -356,34 +356,63 @@ function addShiftPopup(begin, end, shift, isEdit) {
     ).build());
 }
 
-function saveShift(shift, begin, end) {
+function saveShift(shift, begin, end, isEdit) {
     shift.setReferenceDate(formatDate(begin));
-    let counter = 0;
-    new xmlHttpRequestHelper("src/php/saveShift.php", "shift=" + JSON.stringify(shift), true, true, (shift) => {
-        console.log(shift, ++counter);
-        shift = Shift.marshall([].concat(shift));
-        if (Object.values(shift).length != 1) {
-            console.error(shift);
-            return;
-        }
-        shift = Object.values(shift)[0];
-        shifts.push(shift);
+    if(isEdit){
+        new xmlHttpRequestHelper("src/php/saveShift.php", "shift=" + JSON.stringify(shift) + "&update=true", true, true, (shift) => {
+            shift = Shift.marshall([].concat(shift));
+            if (Object.values(shift).length != 1) {
+                console.error(shift);
+                return;
+            }
+            shift = Object.values(shift)[0];
+            shifts[shift.getId()] = shift;
+    
+            let mtbs = [];
+            shift.getMitarbeiter().forEach(id => {
+                mtbs.push(mitarbeiter[id].resolveName());
+            });
+            let cm = cms[shift.getCM()];
+            let event = calendar.getEventById(shift.getId());
 
-        let mtbs = [];
-        shift.getMitarbeiter().forEach(id => {
-            mtbs.push(mitarbeiter[id].resolveName());
-        });
-        let cm = cms[shift.getCM()];
-        calendar.addEvent({
-            id: shift.getId(),
-            title: cm.getName() + "<br />" + mtbs.join(", "),
-            backgroundColor: cm.getColor(),
-            textColor: isHexColorLight(cm.getColor()) ? "black" : "white",
-            start: begin,
-            end: end,
-            allDay: false
-        });
-    }, (error) => showAlert("error", error, true, () => {}, () => {}, "OK", "", true));
+            event.remove();
+
+            calendar.addEvent({
+                id: shift.getId(),
+                title: cm.getName() + "<br />" + mtbs.join(", "),
+                backgroundColor: cm.getColor(),
+                textColor: isHexColorLight(cm.getColor()) ? "black" : "white",
+                start: begin,
+                end: end,
+                allDay: false
+            });
+        }, (error) => showAlert("error", error, true, () => {}, () => {}, "OK", "", true));    
+    }else{
+        new xmlHttpRequestHelper("src/php/saveShift.php", "shift=" + JSON.stringify(shift), true, true, (shift) => {
+            shift = Shift.marshall([].concat(shift));
+            if (Object.values(shift).length != 1) {
+                console.error(shift);
+                return;
+            }
+            shift = Object.values(shift)[0];
+            shifts.push(shift);
+    
+            let mtbs = [];
+            shift.getMitarbeiter().forEach(id => {
+                mtbs.push(mitarbeiter[id].resolveName());
+            });
+            let cm = cms[shift.getCM()];
+            calendar.addEvent({
+                id: shift.getId(),
+                title: cm.getName() + "<br />" + mtbs.join(", "),
+                backgroundColor: cm.getColor(),
+                textColor: isHexColorLight(cm.getColor()) ? "black" : "white",
+                start: begin,
+                end: end,
+                allDay: false
+            });
+        }, (error) => showAlert("error", error, true, () => {}, () => {}, "OK", "", true));    
+    }
 }
 
 function addShift(addEvent) {

@@ -11,8 +11,8 @@ Array.prototype.remove = function () {
     return this;
 };
 
-Array.prototype.concatIfNotNull = function(items){
-    if(!isEmpty(items)){
+Array.prototype.concatIfNotNull = function (items) {
+    if (!isEmpty(items)) {
         return this.concat(items);
     }
     return this;
@@ -97,7 +97,7 @@ const toAlpha = (num) => {
 };
 
 function getUniqueid() {
-    return Date.now().toString(36) + Math.floor(Math.pow(10, 12) + Math.random() * 9*Math.pow(10, 12)).toString(36);
+    return Date.now().toString(36) + Math.floor(Math.pow(10, 12) + Math.random() * 9 * Math.pow(10, 12)).toString(36);
 }
 
 function xmlHttpRequestHelper(requestURL, params, isPost, isAsync, successCallback, errorCallback) {
@@ -117,7 +117,12 @@ function xmlHttpRequestHelper(requestURL, params, isPost, isAsync, successCallba
 
             if (this.responseText != "0 results" && this.responseText.indexOf("0 results") == -1) {
                 try {
-                    var response = JSON.parse(this.responseText);
+                    var response;
+                    try {
+                        response = JSON.parse(this.responseText);
+                    } catch (error) {
+                        response = this.responseText;
+                    }
                     if (!isEmpty(successCallback)) {
                         successCallback(response);
                     }
@@ -126,7 +131,7 @@ function xmlHttpRequestHelper(requestURL, params, isPost, isAsync, successCallba
                     if (!isEmpty(errorCallback)) {
                         console.error("Error while processing success callback");
                         errorCallback(this.responseText);
-                    }else{
+                    } else {
                         console.error(this.responseText);
                     }
                     return xmlhttp;
@@ -134,7 +139,7 @@ function xmlHttpRequestHelper(requestURL, params, isPost, isAsync, successCallba
             }
             if (!isEmpty(errorCallback)) {
                 errorCallback(this.responseText);
-            }else{
+            } else {
                 console.error(this.responseText);
             }
             return xmlhttp;
@@ -145,8 +150,8 @@ function xmlHttpRequestHelper(requestURL, params, isPost, isAsync, successCallba
 function calendarDatesOverlap(el1, el2) {
     var rect1 = el1.getBoundingClientRect();
     var rect2 = el2.getBoundingClientRect();
-    
-    if(rect1.top == rect2.bottom || rect1.bottom == rect2.top){
+
+    if (rect1.top == rect2.bottom || rect1.bottom == rect2.top) {
         // sie berühren sich nur exakt und sind untereinander
         return false;
     }
@@ -168,7 +173,7 @@ function isHexColorLight(color) {
     return brightness > 155;
 }
 
-function isTextFitting(element){
+function isTextFitting(element) {
     return element.scrollWidth > element.getBoundingClientRect().width;
 }
 
@@ -190,8 +195,8 @@ function fromArray(original) {
     return ret;
 }
 
-function formatTimeHHMM(date){
-    if(isEmpty(date)){
+function formatTimeHHMM(date) {
+    if (isEmpty(date)) {
         date = new Date();
     }
     return date.toLocaleTimeString("de-de").substring(0, date.toLocaleTimeString().length - 3)

@@ -5,13 +5,29 @@
         $shift = json_decode($_POST["shift"], true);
         $mitarbeiter = $shift["_mitarbeiter"];
 
-        $sql = "insert into shift (startH, endH, division, scheduledDate)
-        Values (\"".$shift["_begin"]."\",\"".$shift["_end"]."\",".$shift["_cm"].",\"".$shift["_referenceDate"]."\")";
+        $sql;
+
+        if($_POST["update"] === 'true'){
+            $sql = "update shift set startH = \"".$shift["_begin"]."\", endH = \"".$shift["_end"]."\", division = ".$shift["_cm"].", scheduledDate =\"".$shift["_referenceDate"]."\" 
+            where id = ".$shift["_id"];
+        }else{
+            $sql = "insert into shift (startH, endH, division, scheduledDate)
+            Values (\"".$shift["_begin"]."\",\"".$shift["_end"]."\",".$shift["_cm"].",\"".$shift["_referenceDate"]."\")";    
+        }
 
         $con->begin_transaction();
         try{
             $con->query($sql);
-            $result = $con->query("select max(id) as id from shift");
+            $result;
+
+            if($_POST["update"] === 'true'){
+                $sql = "delete from employeeshift where shift=".$shift["_id"];
+                $con->query($sql);
+
+                $result = $con->query("select id from shift where id=".$shift["_id"]);
+            }else{
+                $result = $con->query("select max(id) as id from shift");
+            }
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) 
@@ -53,7 +69,7 @@
         } catch (mysqli_sql_exception $exception) {
             echo($exception);
             $con->rollback();
-        }
+        }    
         mysqli_close($con);       
     }
     else{
