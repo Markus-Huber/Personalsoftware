@@ -74,8 +74,16 @@ class Shift {
             if(isEmpty(weekday) && !isEmpty(element["referenceDate"])){
                 weekday = new Date(element["referenceDate"]).getDay();
             }
+            let begin = element["begin"];
+            if(begin.length == 8 && begin.indexOf(":", begin.indexOf(":")+1) > 0){
+                begin = begin.substring(0, 5);
+            }
+            let end = element["end"];
+            if(end.length == 8 && end.indexOf(":", end.indexOf(":")+1) > 0){
+                end = end.substring(0, 5);
+            }
 
-            ret[element["id"]] = new Shift(element["id"], weekday, element["begin"], element["end"], element["cm"], mitarbeiter, element["referenceDate"]);
+            ret[element["id"]] = new Shift(element["id"], weekday, begin, end, element["cm"], mitarbeiter, element["referenceDate"]);
         });
         return ret;
     }

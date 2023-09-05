@@ -28,6 +28,11 @@ Date.prototype.standardDate = function () {
     ].join('-');
 };
 
+
+Date.prototype.standardIime = function () {
+    return formatTimeHHMM(this);
+};
+
 const isVisible = elem => !!elem && !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
 
 /**
@@ -118,8 +123,11 @@ function xmlHttpRequestHelper(requestURL, params, isPost, isAsync, successCallba
                     }
                     return xmlhttp;
                 } catch (error) {
-                    if (!isEmpty(successCallback)) {
-                        successCallback(this.responseText);
+                    if (!isEmpty(errorCallback)) {
+                        console.error("Error while processing success callback");
+                        errorCallback(this.responseText);
+                    }else{
+                        console.error(this.responseText);
                     }
                     return xmlhttp;
                 }

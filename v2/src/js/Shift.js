@@ -61,8 +61,14 @@ function showShift() {
         },
         eventClick: function (info) {
             if (info.jsEvent.detail == 2) {
-                addShiftPopup(new Date(info.event._instance.range.start), new Date(info.event._instance.range.end));
-                //info.event.remove();
+                let begin = new Date(info.event.start);
+                let end = new Date(info.event.end);
+
+                shifts.forEach(shift => {
+                    if (shift.getId() == info.event._def.publicId) {
+                        addShiftPopup(begin, end, shift, true);
+                    }
+                });
             }
         },
         datesSet: (evt) => {
@@ -71,7 +77,7 @@ function showShift() {
             till.setDate(till.getDate() - 1);
             till = formatDate(till);
 
-            if(fromTills[from + till]){
+            if (fromTills[from + till]) {
                 checkOverlap();
                 return;
             }
@@ -86,7 +92,7 @@ function showShift() {
                     let cm = cms[shift.getCM()];
 
                     calendar.addEvent({
-                        id: getUniqueid(),
+                        id: shift.getId(),
                         title: cm.getName() + "<br />" + mtbs.join(", "),
                         backgroundColor: cm.getColor(),
                         textColor: isHexColorLight(cm.getColor()) ? "black" : "white",
@@ -113,11 +119,7 @@ function showShift() {
     weekDays = weekDays.slice(startDayOfShift - 1).concat(weekDays.slice(0, startDayOfShift - 1));
 }
 
-function addCalendarEvent(shift){
-    
-}
-
-function checkOverlap(){
+function checkOverlap() {
     let dayColumns = document.getElementById("schichtplan-creator").getElementsByClassName("fc-timegrid-col");
     for (let dayColumn of dayColumns) {
         let dates = dayColumn.getElementsByClassName("fc-timegrid-event-harness");
@@ -155,9 +157,9 @@ function checkOverlap(){
     };
 }
 
-function addShiftPopup(begin, end, shift) {
+function addShiftPopup(begin, end, shift, isEdit) {
     if (isEmpty(begin)) {
-        begin = new Date("2023-08-31 12:08:03");
+        begin = new Date();
     }
     if (isEmpty(end)) {
         end = new Date();
@@ -199,7 +201,7 @@ function addShiftPopup(begin, end, shift) {
     });
 
     new ElementBuilder("div").cssClass("popup-header").children(
-        new ElementBuilder("h2").children("Schicht planen"),
+        new ElementBuilder("h2").children("Schicht " + (isEdit ? "bearbeiten" : "planen")),
         new ElementBuilder("h2").children("✔").title("Speichern").cssProperty("padding", "0 1rem").cssClass("hover-effect-zoom").onclick(saveFunction),
         new ElementBuilder("h2").children("✖").title("Schließen").cssClass("hover-effect-zoom").onclick(closeFunction),
     ).parent(parent).build();
@@ -236,28 +238,27 @@ function addShiftPopup(begin, end, shift) {
         shift.setMitarbeiter(mitarbeiter);
         dirty = true;
     };
-
     let mitarbeiter1Dropdown = new Dropdown({
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
-    }).metaName("mitarbeiter").setValue().changeListener(mitarbeiterValueChange);
+    }).metaName("mitarbeiter").setValue(shift.getMitarbeiter()[0]).changeListener(mitarbeiterValueChange);
 
     let mitarbeiter2Dropdown = new Dropdown({
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
-    }).metaName("mitarbeiter").setValue().changeListener(mitarbeiterValueChange);
+    }).metaName("mitarbeiter").setValue(shift.getMitarbeiter()[1]).changeListener(mitarbeiterValueChange);
 
     let mitarbeiter3Dropdown = new Dropdown({
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
-    }).metaName("mitarbeiter").setValue().changeListener(mitarbeiterValueChange);
+    }).metaName("mitarbeiter").setValue(shift.getMitarbeiter()[2]).changeListener(mitarbeiterValueChange);
 
     let cmsById = {};
     cms.forEach(cm => cmsById[cm.getId()] = cm.getName());
     let cmDropdown = new Dropdown({
         data: cmsById,
         placeholder: "z.B. Kasse 1"
-    }).metaName("cm").setValue().changeListener((event, item) => {
+    }).metaName("cm").setValue(shift.getCM()).changeListener((event, item) => {
         shift.setCM(Object.keys(item)[0]);
         dirty = true;
     });
@@ -357,23 +358,32 @@ function addShiftPopup(begin, end, shift) {
 
 function saveShift(shift, begin, end) {
     shift.setReferenceDate(formatDate(begin));
-    shifts.push(shift);
-    new xmlHttpRequestHelper("src/php/saveShift.php", "shift=" + JSON.stringify(shift), true, true, (message) => console.log(message));
+    let counter = 0;
+    new xmlHttpRequestHelper("src/php/saveShift.php", "shift=" + JSON.stringify(shift), true, true, (shift) => {
+        console.log(shift, ++counter);
+        shift = Shift.marshall([].concat(shift));
+        if (Object.values(shift).length != 1) {
+            console.error(shift);
+            return;
+        }
+        shift = Object.values(shift)[0];
+        shifts.push(shift);
 
-    let mtbs = [];
-    shift.getMitarbeiter().forEach(id => {
-        mtbs.push(mitarbeiter[id].resolveName());
-    });
-    let cm = cms[shift.getCM()];
-    calendar.addEvent({
-        id: getUniqueid(),
-        title: cm.getName() + "<br />" + mtbs.join(", "),
-        backgroundColor: cm.getColor(),
-        textColor: isHexColorLight(cm.getColor()) ? "black" : "white",
-        start: begin,
-        end: end,
-        allDay: false
-    });
+        let mtbs = [];
+        shift.getMitarbeiter().forEach(id => {
+            mtbs.push(mitarbeiter[id].resolveName());
+        });
+        let cm = cms[shift.getCM()];
+        calendar.addEvent({
+            id: shift.getId(),
+            title: cm.getName() + "<br />" + mtbs.join(", "),
+            backgroundColor: cm.getColor(),
+            textColor: isHexColorLight(cm.getColor()) ? "black" : "white",
+            start: begin,
+            end: end,
+            allDay: false
+        });
+    }, (error) => showAlert("error", error, true, () => {}, () => {}, "OK", "", true));
 }
 
 function addShift(addEvent) {

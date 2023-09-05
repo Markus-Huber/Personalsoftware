@@ -11,7 +11,6 @@
         $con->begin_transaction();
         try{
             $con->query($sql);
-            echo("\n");
             $result = $con->query("select max(id) as id from shift");
 
             if ($result->num_rows > 0) {
@@ -33,6 +32,20 @@
                     unset($arbeiter);
 
                     $con->query($sql);
+
+                    $sql = "select * from (select s.*, GROUP_CONCAT(es.employee) as employees from shift s left join employeeshift es on s.id = es.shift group by s.id) shifts 
+                    where shifts.id = ".$shiftId." order by shifts.scheduledDate";
+
+                    $result2 = $con->query($sql);
+                    
+                    if ($result2->num_rows > 0) {
+                        while ($row2 = $result2->fetch_assoc()) 
+                        {
+                            $jsonArrayObject = (array('id' => $row2["id"], 'referenceDate' => $row2["scheduledDate"], 'cm' => $row2["division"],
+                            'mitarbeiter' => $row2["employees"], 'begin' => $row2["startH"], 'end' => $row2["endH"]));
+                            echo json_encode($jsonArrayObject);
+                        }
+                    }
                 }
             }
 
