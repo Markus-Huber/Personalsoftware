@@ -177,6 +177,14 @@ function isTextFitting(element) {
     return element.scrollWidth > element.getBoundingClientRect().width;
 }
 
+function resolveDateRange(from, till) {
+    const datesArray = [];
+    for (let date = new Date(from.getTime()); date <= till; date.setDate(date.getDate() + 1)) {
+        datesArray.push(new Date(date));
+    }
+    return datesArray;
+}
+
 /**
  * Nimmt eine Form von HTML Iterable, wie einen Dom- Childlist und wandelt sie in einen statischen Array um.
  * Diese Methode existiert da zum Beispiel eine Liste von Kind- Elementen dynamisch ist und es zu 

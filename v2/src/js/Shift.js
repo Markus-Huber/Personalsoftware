@@ -1,5 +1,7 @@
 let shifts = [];
 let fromTills = [];
+let from;
+let till;
 
 function showShift() {
     content.innerHTML = null;
@@ -72,8 +74,8 @@ function showShift() {
             }
         },
         datesSet: (evt) => {
-            let from = formatDate(new Date(evt.start));
-            let till = new Date(evt.end);
+            from = formatDate(new Date(evt.start));
+            till = new Date(evt.end);
             till.setDate(till.getDate() - 1);
             till = formatDate(till);
 
@@ -101,6 +103,10 @@ function showShift() {
                         allDay: false
                     });
                 });
+
+                from = new Date(evt.start);
+                till = new Date(evt.end);
+                till.setDate(till.getDate() - 1);
             });
         },
         eventAdd: () => {
@@ -170,7 +176,6 @@ function addShiftPopup(begin, end, shift, isEdit) {
     let dirty = false;
 
     // Werte aus den übergebenen Events übertragen
-    shift.setWeekday(begin.getDate());
     shift.setBegin(formatTimeHHMM(begin));
     shift.setEnd(formatTimeHHMM(end));
 
@@ -223,7 +228,18 @@ function addShiftPopup(begin, end, shift, isEdit) {
         data: weekDaysById,
         placeholder: "z.B. " + weekDaysById[Object.keys(weekDaysById)[0]]
     }).metaName("wochentag").setValue(initialWeekday).changeListener((event, item) => {
-        shift.setWeekday(Object.keys(item)[0]);
+        let weekDay = Object.keys(item)[0];
+        let dates = resolveDateRange(from, till);
+        dates.forEach(date => {
+            if((date.getDay() -1) == weekDay){
+                date.setHours(shift.getBegin().substring(0, 2), shift.getBegin().substring(3, shift.getBegin().length));
+                shift.setReferenceDate(date);
+                begin = new Date(date);
+                date.setHours(shift.getEnd().substring(0, 2), shift.getEnd().substring(3, shift.getEnd().length));
+                end = new Date(date);
+            }
+        });
+        shift.setWeekday(weekDay);
         dirty = true;
     });
 
@@ -285,7 +301,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
                             .changeListener((event, value) => {
                                 if (/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
                                     shift.setBegin(value);
-                                    begin.setHours(value.substring(0, 2), value.substring(3, value.length));
+                                    begin = new Date(begin.setHours(value.substring(0, 2), value.substring(3, value.length)));
                                     dirty = true;
                                 }
                             })
@@ -301,7 +317,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
                             .changeListener((event, value) => {
                                 if (/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
                                     shift.setEnd(value);
-                                    end.setHours(value.substring(0, 2), value.substring(3, value.length));
+                                    end = new Date(end.setHours(value.substring(0, 2), value.substring(3, value.length)));
                                     dirty = true;
                                 }
                             })
@@ -351,14 +367,22 @@ function addShiftPopup(begin, end, shift, isEdit) {
     parent.appendChild(parentTable.build());
 
     parent.appendChild(new ElementBuilder("div").cssClass("button-bar").children(
+        isEdit ? new ElementBuilder("button").cssClass("hover-effect-zoom").children("Löschen").onclick(() => {
+            showAlert("warning", "Wollen Sie diese Schicht wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden!", true, () => {
+                parent.parentElement.removeChild(parent);
+                const event = new Event("popupClosed");
+                parent.dispatchEvent(event);
+                //TODO:
+            });
+        }) : undefined,
         new ElementBuilder("button").cssClass("hover-effect-zoom").children("Speichern").onclick(saveFunction),
-        new ElementBuilder("button").cssClass("hover-effect-zoom").children("Abbrechen").onclick(closeFunction)
+        new ElementBuilder("button").cssClass("hover-effect-zoom").children("Abbrechen").onclick(closeFunction),
     ).build());
 }
 
 function saveShift(shift, begin, end, isEdit) {
     shift.setReferenceDate(formatDate(begin));
-    if(isEdit){
+    if (isEdit) {
         new xmlHttpRequestHelper("src/php/saveShift.php", "shift=" + JSON.stringify(shift) + "&update=true", true, true, (shift) => {
             shift = Shift.marshall([].concat(shift));
             if (Object.values(shift).length != 1) {
@@ -367,7 +391,7 @@ function saveShift(shift, begin, end, isEdit) {
             }
             shift = Object.values(shift)[0];
             shifts[shift.getId()] = shift;
-    
+
             let mtbs = [];
             shift.getMitarbeiter().forEach(id => {
                 mtbs.push(mitarbeiter[id].resolveName());
@@ -386,8 +410,8 @@ function saveShift(shift, begin, end, isEdit) {
                 end: end,
                 allDay: false
             });
-        }, (error) => showAlert("error", error, true, () => {}, () => {}, "OK", "", true));    
-    }else{
+        }, (error) => showAlert("error", error, true, () => {}, () => {}, "OK", "", true));
+    } else {
         new xmlHttpRequestHelper("src/php/saveShift.php", "shift=" + JSON.stringify(shift), true, true, (shift) => {
             shift = Shift.marshall([].concat(shift));
             if (Object.values(shift).length != 1) {
@@ -396,7 +420,7 @@ function saveShift(shift, begin, end, isEdit) {
             }
             shift = Object.values(shift)[0];
             shifts.push(shift);
-    
+
             let mtbs = [];
             shift.getMitarbeiter().forEach(id => {
                 mtbs.push(mitarbeiter[id].resolveName());
@@ -411,7 +435,7 @@ function saveShift(shift, begin, end, isEdit) {
                 end: end,
                 allDay: false
             });
-        }, (error) => showAlert("error", error, true, () => {}, () => {}, "OK", "", true));    
+        }, (error) => showAlert("error", error, true, () => {}, () => {}, "OK", "", true));
     }
 }
 
