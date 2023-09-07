@@ -74,18 +74,20 @@ function showShift() {
             }
         },
         datesSet: (evt) => {
-            from = formatDate(new Date(evt.start));
+            from = new Date(evt.start);
+            let fromString = formatDate(new Date(evt.start));
+
             till = new Date(evt.end);
             till.setDate(till.getDate() - 1);
-            till = formatDate(till);
+            let tillString = formatDate(till);
 
-            if (fromTills[from + till]) {
+            if (fromTills[fromString + tillString]) {
                 checkOverlap();
                 return;
             }
-            new xmlHttpRequestHelper("src/php/requestShift.php", "from=" + from + "&till=" + till, true, true, (shiftsRaw) => {
+            new xmlHttpRequestHelper("src/php/requestShift.php", "from=" + fromString + "&till=" + tillString, true, true, (shiftsRaw) => {
                 shifts = Shift.marshall(shiftsRaw);
-                fromTills[from + till] = true;
+                fromTills[fromString + tillString] = true;
                 shifts.forEach(shift => {
                     let mtbs = [];
                     shift.getMitarbeiter().forEach(id => {
@@ -103,10 +105,6 @@ function showShift() {
                         allDay: false
                     });
                 });
-
-                from = new Date(evt.start);
-                till = new Date(evt.end);
-                till.setDate(till.getDate() - 1);
             });
         },
         eventAdd: () => {
@@ -114,6 +112,8 @@ function showShift() {
         }
     })
     calendar.render();
+
+    buildCopyShiftsButton();
 
     let date = new Date('2022/08/22');
     for (let i = 0; i <= 6; i++) {
@@ -123,6 +123,39 @@ function showShift() {
         date.setDate(date.getDate() + 1);
     }
     weekDays = weekDays.slice(startDayOfShift - 1).concat(weekDays.slice(0, startDayOfShift - 1));
+}
+
+function buildCopyShiftsButton(){
+    let parent = document.getElementsByClassName("fc-today-button");
+    if(parent.length < 1){
+        return;
+    }
+    parent = parent[0].parentElement;
+
+    let weeksById = {};
+    let weekFrom = new Date(new Date().setDate(from.getDate() - 7));
+    let weekTill = new Date(new Date().setDate(till.getDate() - 7));
+
+    for(let i = 0; i < 4; i++){
+        weeksById[i] = formatDateGerman(weekFrom) + " - " + formatDateGerman(weekTill);
+        weekFrom = new Date(new Date().setDate(weekFrom.getDate() - 7));
+        weekTill = new Date(new Date().setDate(weekTill.getDate() - 7));
+    }
+    let copyDropdown = new Dropdown({
+        data: weeksById,
+        placeholder: "Schichten kopieren von..."
+    }).metaName("wochen").setValue().changeListener((event, item) => {
+        if(isEmpty(copyDropdown.getValue())){
+            return;
+        }
+        showAlert("info","Mitarbeiter pro CM mit kopieren?", true, () => {
+            let week = Object.values(weeksById)[copyDropdown.getValue()].split(" - ");
+            console.log(formatGermanDateToInternational(week[0]), formatGermanDateToInternational(week[1]));
+        }, () => {
+
+        }, "Ja", "Nein");
+    });
+    parent.prepend(copyDropdown.build());
 }
 
 function checkOverlap() {
@@ -369,11 +402,13 @@ function addShiftPopup(begin, end, shift, isEdit) {
     parent.appendChild(new ElementBuilder("div").cssClass("button-bar").children(
         isEdit ? new ElementBuilder("button").cssClass("hover-effect-zoom").children("Löschen").onclick(() => {
             showAlert("warning", "Wollen Sie diese Schicht wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden!", true, () => {
-                parent.parentElement.removeChild(parent);
-                const event = new Event("popupClosed");
-                parent.dispatchEvent(event);
-                //TODO:
-            });
+                new xmlHttpRequestHelper("src/php/deleteShift.php", "shift=" + shift.getId() + "&update=true", true, true, () => {
+                    parent.parentElement.removeChild(parent);
+                    const event = new Event("popupClosed");
+                    parent.dispatchEvent(event);
+                    calendar.getEventById(shift.getId()).remove();
+                });
+            }, () => {}, "Ja", "Nein");
         }) : undefined,
         new ElementBuilder("button").cssClass("hover-effect-zoom").children("Speichern").onclick(saveFunction),
         new ElementBuilder("button").cssClass("hover-effect-zoom").children("Abbrechen").onclick(closeFunction),

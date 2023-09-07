@@ -37,3 +37,12 @@
     margin: .2em;
     overflow: hidden;
 }
+
+.fc-toolbar-chunk{
+    display: flex;
+}
+
+.fc-toolbar-chunk .combobox input{
+    padding: 0.5em 0.65em;
+    cursor: pointer;
+}

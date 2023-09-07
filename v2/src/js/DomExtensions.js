@@ -219,6 +219,19 @@ function formatDate(date) {
     return date;
 }
 
+function formatDateGerman(date) {
+    var aktDate = !isEmpty(date) ? date : new Date();
+    var day = (aktDate.getDate() + "0").length > 2 ? aktDate.getDate() : "0" + aktDate.getDate();
+    var month = (aktDate.getMonth() + "0").length > 2 ? (aktDate.getMonth() + 1) : "0" + (aktDate.getMonth() + 1);
+    var date = day + "." + month + "." + aktDate.getFullYear();
+
+    return date;
+}
+
+function formatGermanDateToInternational(date) {
+    return date.substring(6, date.length) + "-" + date.substring(3, 5) + "-" + date.substring(0, 2);
+}
+
 function formatDateDatabaseDE(_date) {
     if (isEmpty(_date) || _date.indexOf("-") == -1) {
         return "";
