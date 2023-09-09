@@ -105,23 +105,7 @@ function showShift() {
             new xmlHttpRequestHelper("src/php/requestShift.php", "from=" + fromString + "&till=" + tillString, true, true, (shiftsRaw) => {
                 shifts = Shift.marshall(shiftsRaw);
                 fromTills[fromString + tillString] = true;
-                shifts.forEach(shift => {
-                    let mtbs = [];
-                    shift.getMitarbeiter().forEach(id => {
-                        mtbs.push(mitarbeiter[id].resolveName());
-                    });
-                    let cm = cms[shift.getCM()];
-
-                    calendar.addEvent({
-                        id: shift.getId(),
-                        title: cm.getName() + "<br />" + mtbs.join(", "),
-                        backgroundColor: cm.getColor(),
-                        textColor: isHexColorLight(cm.getColor()) ? "black" : "white",
-                        start: new Date(shift.getReferenceDate() + "T" + shift.getBegin()),
-                        end: new Date(shift.getReferenceDate() + "T" + shift.getEnd()),
-                        allDay: false
-                    });
-                });
+                shifts.forEach(shift => addEvent(shift));
             });
         },
         eventAdd: () => {
@@ -221,10 +205,20 @@ function checkOverlap() {
                 for (let elemToAdjust of elementsToAdjust) {
                     elemToAdjust.style.maxWidth = width;
                     if (!isTextFitting(elemToAdjust)) {
-                        elemToAdjust.classList.add("fc-timegrid-event-harness-vertical-text")
+                        elemToAdjust.classList.add("fc-timegrid-event-harness-vertical-text");
                     }
                 }
             }
+            setTimeout(() => {
+                if (!isEmpty(width)) {
+                    for (let elemToAdjust of elementsToAdjust) {
+                        elemToAdjust.style.maxWidth = width;
+                        if(elementsToAdjust.length > 2){
+                            window.fitText(elemToAdjust.getElementsByClassName("fc-event-main")[0], 0.3);
+                        }
+                    }
+                }    
+            }, 100);
         }
     };
 }
@@ -367,7 +361,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
                             .changeListener((event, value) => {
                                 if (/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
                                     shift.setBegin(value);
-                                    begin = new Date(begin.setHours(value.substring(0, 2), value.substring(3, value.length)));
+                                    begin.setHours(value.substring(0, 2), value.substring(3, value.length));
                                     dirty = true;
                                 }
                             })
@@ -383,7 +377,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
                             .changeListener((event, value) => {
                                 if (/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
                                     shift.setEnd(value);
-                                    end = new Date(end.setHours(value.substring(0, 2), value.substring(3, value.length)));
+                                    end.setHours(value.substring(0, 2), value.substring(3, value.length));
                                     dirty = true;
                                 }
                             })
@@ -460,24 +454,9 @@ function saveShift(shift, begin, end, isEdit) {
             shift = Object.values(shift)[0];
             shifts[shift.getId()] = shift;
 
-            let mtbs = [];
-            shift.getMitarbeiter().forEach(id => {
-                mtbs.push(mitarbeiter[id].resolveName());
-            });
-            let cm = cms[shift.getCM()];
             let event = calendar.getEventById(shift.getId());
-
             event.remove();
-
-            calendar.addEvent({
-                id: shift.getId(),
-                title: cm.getName() + "<br />" + mtbs.join(", "),
-                backgroundColor: cm.getColor(),
-                textColor: isHexColorLight(cm.getColor()) ? "black" : "white",
-                start: begin,
-                end: end,
-                allDay: false
-            });
+            addEvent(shift, begin, end);
         }, (error) => showAlert("error", error, true, () => {}, () => {}, "OK", "", true));
     } else {
         new xmlHttpRequestHelper("src/php/saveShift.php", "shift=" + JSON.stringify(shift), true, true, (shift) => {
@@ -488,23 +467,26 @@ function saveShift(shift, begin, end, isEdit) {
             }
             shift = Object.values(shift)[0];
             shifts.push(shift);
-
-            let mtbs = [];
-            shift.getMitarbeiter().forEach(id => {
-                mtbs.push(mitarbeiter[id].resolveName());
-            });
-            let cm = cms[shift.getCM()];
-            calendar.addEvent({
-                id: shift.getId(),
-                title: cm.getName() + "<br />" + mtbs.join(", "),
-                backgroundColor: cm.getColor(),
-                textColor: isHexColorLight(cm.getColor()) ? "black" : "white",
-                start: begin,
-                end: end,
-                allDay: false
-            });
+            addEvent(shift, begin, end);
         }, (error) => showAlert("error", error, true, () => {}, () => {}, "OK", "", true));
     }
+}
+
+function addEvent(shift, begin = new Date(shift.getReferenceDate() + "T" + shift.getBegin()), end = new Date(shift.getReferenceDate() + "T" + shift.getEnd())) {
+    let mtbs = [];
+    shift.getMitarbeiter().forEach(id => {
+        mtbs.push(mitarbeiter[id].resolveName());
+    });
+    let cm = cms[shift.getCM()];
+    calendar.addEvent({
+        id: shift.getId(),
+        title: cm.getName() + " (" + shift.getBegin() + " - " + shift.getEnd() + ")<br />" + mtbs.join(", "),
+        backgroundColor: cm.getColor(),
+        textColor: isHexColorLight(cm.getColor()) ? "black" : "white",
+        start: begin,
+        end: end,
+        allDay: false
+    });
 }
 
 function addShift(addEvent) {
