@@ -183,6 +183,7 @@ function checkOverlap() {
             let elementsToAdjust = [];
             let width;
             let highestNumberOfOverlaps = 0;
+            let minWidth = 20;
 
             for (let date of dates) {
                 let numberOfOverlaps = 1;
@@ -196,7 +197,11 @@ function checkOverlap() {
                 if (numberOfOverlaps > 1) {
                     if (highestNumberOfOverlaps < numberOfOverlaps) {
                         highestNumberOfOverlaps = numberOfOverlaps;
-                        width = ((100 / numberOfOverlaps) - 10) + "%";
+                        width = ((100 / numberOfOverlaps) - 4);
+                        if (width < minWidth) {
+                            width = minWidth;
+                        }
+                        width = width + "%";
                     }
                     elementsToAdjust.push(date);
                 }
@@ -204,7 +209,7 @@ function checkOverlap() {
             if (!isEmpty(width)) {
                 for (let elemToAdjust of elementsToAdjust) {
                     elemToAdjust.style.maxWidth = width;
-                    if (!isTextFitting(elemToAdjust)) {
+                    if (!isTextFitting(elemToAdjust) || elementsToAdjust.length > 2) {
                         elemToAdjust.classList.add("fc-timegrid-event-harness-vertical-text");
                     }
                 }
@@ -213,14 +218,21 @@ function checkOverlap() {
                 if (!isEmpty(width)) {
                     for (let elemToAdjust of elementsToAdjust) {
                         elemToAdjust.style.maxWidth = width;
-                        if(elementsToAdjust.length > 2){
+                        if (elementsToAdjust.length > 2) {
                             window.fitText(elemToAdjust.getElementsByClassName("fc-event-main")[0], 0.3);
                         }
                     }
-                }    
+                }
             }, 100);
         }
     };
+
+    setTimeout(() => {
+        let shifts = document.getElementsByClassName("fc-timegrid-event");
+        for (i = 0; i < shifts.length; i++) {
+            shifts[i].title = shifts[i].getElementsByClassName("fc-event-main")[0].innerHTML.split("<br>").join("\n");
+        }            
+    }, 500);
 }
 
 function addShiftPopup(begin, end, shift, isEdit) {

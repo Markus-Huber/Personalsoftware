@@ -47,3 +47,7 @@
     padding: 0.5em 0.65em;
     cursor: pointer;
 }
+
+.fc-timegrid-event-harness-inset .fc-timegrid-event{
+    cursor: pointer;
+}
