@@ -125,9 +125,9 @@ function showShift() {
     weekDays = weekDays.slice(startDayOfShift - 1).concat(weekDays.slice(0, startDayOfShift - 1));
 }
 
-function buildCopyShiftsButton(){
+function buildCopyShiftsButton() {
     let parent = document.getElementsByClassName("fc-today-button");
-    if(parent.length < 1){
+    if (parent.length < 1) {
         return;
     }
     parent = parent[0].parentElement;
@@ -136,26 +136,38 @@ function buildCopyShiftsButton(){
     let weekFrom = new Date(new Date().setDate(from.getDate() - 7));
     let weekTill = new Date(new Date().setDate(till.getDate() - 7));
 
-    for(let i = 0; i < 4; i++){
+    for (let i = 0; i < 4; i++) {
         weeksById[i] = formatDateGerman(weekFrom) + " - " + formatDateGerman(weekTill);
-        weekFrom = new Date(new Date().setDate(weekFrom.getDate() - 7));
-        weekTill = new Date(new Date().setDate(weekTill.getDate() - 7));
+        weekFrom.setDate(weekFrom.getDate() - 7);
+        weekTill.setDate(weekTill.getDate() - 7);
     }
     let copyDropdown = new Dropdown({
         data: weeksById,
         placeholder: "Schichten kopieren von..."
     }).metaName("wochen").setValue().changeListener((event, item) => {
-        if(isEmpty(copyDropdown.getValue())){
+        if (isEmpty(copyDropdown.getValue())) {
             return;
         }
-        showAlert("info","Mitarbeiter pro CM mit kopieren?", true, () => {
+        showAlert("info", "Mitarbeiter pro CM mit kopieren?", true, () => {
             let week = Object.values(weeksById)[copyDropdown.getValue()].split(" - ");
-            console.log(formatGermanDateToInternational(week[0]), formatGermanDateToInternational(week[1]));
+            copyShifts(week, true);
         }, () => {
-
+            let week = Object.values(weeksById)[copyDropdown.getValue()].split(" - ");
+            copyShifts(week, false);
         }, "Ja", "Nein");
     });
     parent.prepend(copyDropdown.build());
+}
+
+function copyShifts(week, withEmployees) {
+    new xmlHttpRequestHelper("src/php/copyShifts.php",
+        "oldFrom=" + formatGermanDateToInternational(week[0]) + "&oldTill=" + formatGermanDateToInternational(week[1]) + "&withEmployees=" + withEmployees +
+        "&newFrom=" + formatDateGerman(from) + "&newTill=" + formatDateGerman(till),
+        true, true, () => {
+            //refresh
+            calendar.next();
+            calendar.prev();
+        });
 }
 
 function checkOverlap() {
@@ -264,7 +276,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
         let weekDay = Object.keys(item)[0];
         let dates = resolveDateRange(from, till);
         dates.forEach(date => {
-            if((date.getDay() -1) == weekDay){
+            if ((date.getDay() - 1) == weekDay) {
                 date.setHours(shift.getBegin().substring(0, 2), shift.getBegin().substring(3, shift.getBegin().length));
                 shift.setReferenceDate(date);
                 begin = new Date(date);

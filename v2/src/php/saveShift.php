@@ -7,7 +7,9 @@
 
         $sql;
 
-        if($_POST["update"] === 'true'){
+        $isUpdate = !empty($_POST["update"]) && $_POST["update"] === 'true';
+
+        if( $isUpdate){
             $sql = "update shift set startH = \"".$shift["_begin"]."\", endH = \"".$shift["_end"]."\", division = ".$shift["_cm"].", scheduledDate =\"".$shift["_referenceDate"]."\" 
             where id = ".$shift["_id"];
         }else{
@@ -20,7 +22,7 @@
             $con->query($sql);
             $result;
 
-            if($_POST["update"] === 'true'){
+            if( $isUpdate){
                 $sql = "delete from employeeshift where shift=".$shift["_id"];
                 $con->query($sql);
 
