@@ -2,6 +2,9 @@ let shifts = [];
 let fromTills = [];
 let from;
 let till;
+let currentWeekFrom;
+let currentWeekTill;
+let copyDropdown;
 
 function showShift() {
     content.innerHTML = null;
@@ -75,11 +78,25 @@ function showShift() {
         },
         datesSet: (evt) => {
             from = new Date(evt.start);
+            if (isEmpty(currentWeekFrom)) {
+                currentWeekFrom = new Date(from);
+            }
             let fromString = formatDate(new Date(evt.start));
 
             till = new Date(evt.end);
             till.setDate(till.getDate() - 1);
+            if (isEmpty(currentWeekTill)) {
+                currentWeekTill = new Date(till);
+            }
             let tillString = formatDate(till);
+
+            if (!isEmpty(document.getElementById("copyDropdown"))) {
+                if (from != currentWeekFrom && from < currentWeekFrom) {
+                    document.getElementById("copyDropdown").style.display = "none";
+                } else {
+                    document.getElementById("copyDropdown").style.display = null;
+                }
+            }
 
             if (fromTills[fromString + tillString]) {
                 checkOverlap();
@@ -141,7 +158,7 @@ function buildCopyShiftsButton() {
         weekFrom.setDate(weekFrom.getDate() - 7);
         weekTill.setDate(weekTill.getDate() - 7);
     }
-    let copyDropdown = new Dropdown({
+    copyDropdown = new Dropdown({
         data: weeksById,
         placeholder: "Schichten kopieren von..."
     }).metaName("wochen").setValue().changeListener((event, item) => {
@@ -156,7 +173,10 @@ function buildCopyShiftsButton() {
             copyShifts(week, false);
         }, "Ja", "Nein");
     });
-    parent.prepend(copyDropdown.build());
+    let built = copyDropdown.build();
+    built.id = "copyDropdown";
+
+    parent.prepend(built);
 }
 
 function copyShifts(week, withEmployees) {
@@ -167,6 +187,7 @@ function copyShifts(week, withEmployees) {
             //refresh
             calendar.next();
             calendar.prev();
+            copyDropdown.setValue();
         });
 }
 
