@@ -208,6 +208,9 @@ function Dropdown(_config) {
 
   this.setValue = function (key) {
     noValue = isEmpty(key);
+    if(noValue){
+      input.value = "";
+    }
 
     for (var i = 0; i < self.listitems.length; i++) {
       if (self.listitems[i].id == "ID_" + key) {

@@ -313,14 +313,13 @@ function addShiftPopup(begin, end, shift, isEdit) {
         });
         shift.setWeekday(weekDay);
         dirty = true;
+        recalculcateBlacklists();
     });
 
 
     let blacklists = resolveBlacklists(shift, begin);
     let blacklistMitarbeiter = blacklists[0];
     let blacklistCMs = blacklists[1];
-
-    console.log(blacklistMitarbeiter, blacklistCMs);
 
     let mitarbeiterById = {};
     mitarbeiter.forEach(arbeiter => mitarbeiterById[arbeiter.getId()] = arbeiter.resolveName());
@@ -399,6 +398,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
                                     shift.setBegin(value);
                                     begin.setHours(value.substring(0, 2), value.substring(3, value.length));
                                     dirty = true;
+                                    recalculcateBlacklists();
                                 }
                             })
                         )
@@ -415,6 +415,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
                                     shift.setEnd(value);
                                     end.setHours(value.substring(0, 2), value.substring(3, value.length));
                                     dirty = true;
+                                    recalculcateBlacklists();
                                 }
                             })
                         )
@@ -476,6 +477,70 @@ function addShiftPopup(begin, end, shift, isEdit) {
         new ElementBuilder("button").cssClass("hover-effect-zoom").children("Speichern").onclick(saveFunction),
         new ElementBuilder("button").cssClass("hover-effect-zoom").children("Abbrechen").onclick(closeFunction),
     ).build());
+
+    let firstTime = true;
+    function recalculcateBlacklists() {
+        blacklists = resolveBlacklists(shift, begin);
+        blacklistMitarbeiter = blacklists[0];
+        blacklistCMs = blacklists[1];
+
+        mitarbeiterById = {};
+        mitarbeiter.forEach(arbeiter => mitarbeiterById[arbeiter.getId()] = arbeiter.resolveName());
+        mitarbeiterById = Object.fromEntries(Object.entries(mitarbeiterById).filter(([key]) => !blacklistMitarbeiter.includes(key)));
+        
+        cmsById = {};
+        cms.forEach(cm => cmsById[cm.getId()] = cm.getName());
+        cmsById = Object.fromEntries(Object.entries(cmsById).filter(([key]) => !blacklistCMs.includes(key)));
+
+        let messages = [];
+
+        if (blacklistMitarbeiter.includes(mitarbeiter1Dropdown.getValue())) {
+            messages.push(mitarbeiter[mitarbeiter1Dropdown.getValue()].resolveName());
+            mitarbeiter1Dropdown.setValue();
+        }
+        if (blacklistMitarbeiter.includes(mitarbeiter2Dropdown.getValue())) {
+            messages.push(mitarbeiter[mitarbeiter2Dropdown.getValue()].resolveName());
+            mitarbeiter2Dropdown.setValue();
+        }
+        if (blacklistMitarbeiter.includes(mitarbeiter3Dropdown.getValue())) {
+            messages.push(mitarbeiter[mitarbeiter3Dropdown.getValue()].resolveName());
+            mitarbeiter3Dropdown.setValue();
+        }
+
+        mitarbeiter1Dropdown.setItems(mitarbeiterById);
+        mitarbeiter2Dropdown.setItems(mitarbeiterById);
+        mitarbeiter3Dropdown.setItems(mitarbeiterById);
+
+        let oldCM;
+        if (blacklistCMs.includes(cmDropdown.getValue())) {
+            oldCM = cms[cmDropdown.getValue()].getName();
+            cmDropdown.setValue();
+        }
+        cmDropdown.setItems(cmsById);
+
+        mitarbeiter1Dropdown.setItems(Object.fromEntries(Object.entries(mitarbeiterById).filter(([key]) => {
+            return key != mitarbeiter2Dropdown.getValue() && key != mitarbeiter3Dropdown.getValue() && !blacklistMitarbeiter.includes(key);
+        })));
+        mitarbeiter2Dropdown.setItems(Object.fromEntries(Object.entries(mitarbeiterById).filter(([key]) => {
+            return key != mitarbeiter1Dropdown.getValue() && key != mitarbeiter3Dropdown.getValue() && !blacklistMitarbeiter.includes(key);
+        })));
+        mitarbeiter3Dropdown.setItems(Object.fromEntries(Object.entries(mitarbeiterById).filter(([key]) => {
+            return key != mitarbeiter1Dropdown.getValue() && key != mitarbeiter2Dropdown.getValue() && !blacklistMitarbeiter.includes(key);
+        })));
+
+        if(firstTime){
+            firstTime = false;
+            return;
+        }
+
+        let message = (messages.length > 1 ? "Die Mitarbeiter" : "Der Mitarbeiter") + " <b>";
+        message += messages.join(", ") + "</b><br>";
+        if(!isEmpty(oldCM)){
+            message += "und die CM <b>" + oldCM + "</b><br>";
+        }
+        message += (messages.length > 1 || !isEmpty(oldCM) ? "können" : "kann") + " zu dieser Uhrzeit/ an diesem Wochentag<br>nicht erneut eingeteil werden";
+        showAlert("error", message, true, () => {}, () => {}, "OK", "", true)
+    }
 }
 
 function resolveBlacklists(shift, begin) {
