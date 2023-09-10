@@ -231,7 +231,7 @@ function checkOverlap() {
         let shifts = document.getElementsByClassName("fc-timegrid-event");
         for (i = 0; i < shifts.length; i++) {
             shifts[i].title = shifts[i].getElementsByClassName("fc-event-main")[0].innerHTML.split("<br>").join("\n");
-        }            
+        }
     }, 500);
 }
 
@@ -315,34 +315,58 @@ function addShiftPopup(begin, end, shift, isEdit) {
         dirty = true;
     });
 
+
+    let blacklists = resolveBlacklists(shift, begin);
+    let blacklistMitarbeiter = blacklists[0];
+    let blacklistCMs = blacklists[1];
+
+    console.log(blacklistMitarbeiter, blacklistCMs);
+
     let mitarbeiterById = {};
     mitarbeiter.forEach(arbeiter => mitarbeiterById[arbeiter.getId()] = arbeiter.resolveName());
+    mitarbeiterById = Object.fromEntries(Object.entries(mitarbeiterById).filter(([key]) => !blacklistMitarbeiter.includes(key)));
 
-    let mitarbeiterValueChange = () => {
+    let mitarbeiterValueChange = (current, other1, other2) => {
         let mitarbeiter = [].concatIfNotNull(mitarbeiter1Dropdown.getValue())
             .concatIfNotNull(mitarbeiter2Dropdown.getValue())
             .concatIfNotNull(mitarbeiter3Dropdown.getValue());
 
         shift.setMitarbeiter(mitarbeiter);
         dirty = true;
+
+        other1.setItems(Object.fromEntries(Object.entries(mitarbeiterById).filter(([key]) => {
+            return key != current.getValue() && key != other2.getValue() && !blacklistMitarbeiter.includes(key);
+        })));
+        other2.setItems(Object.fromEntries(Object.entries(mitarbeiterById).filter(([key]) => {
+            return key != current.getValue() && key != other1.getValue() && !blacklistMitarbeiter.includes(key);
+        })));
     };
+
     let mitarbeiter1Dropdown = new Dropdown({
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
-    }).metaName("mitarbeiter").setValue(shift.getMitarbeiter()[0]).changeListener(mitarbeiterValueChange);
+    }).metaName("mitarbeiter").setValue(shift.getMitarbeiter()[0]).changeListener(() => {
+        mitarbeiterValueChange(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
+    });
 
     let mitarbeiter2Dropdown = new Dropdown({
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
-    }).metaName("mitarbeiter").setValue(shift.getMitarbeiter()[1]).changeListener(mitarbeiterValueChange);
+    }).metaName("mitarbeiter").setValue(shift.getMitarbeiter()[1]).changeListener(() => {
+        mitarbeiterValueChange(mitarbeiter2Dropdown, mitarbeiter1Dropdown, mitarbeiter3Dropdown);
+    });
 
     let mitarbeiter3Dropdown = new Dropdown({
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
-    }).metaName("mitarbeiter").setValue(shift.getMitarbeiter()[2]).changeListener(mitarbeiterValueChange);
+    }).metaName("mitarbeiter").setValue(shift.getMitarbeiter()[2]).changeListener(() => {
+        mitarbeiterValueChange(mitarbeiter3Dropdown, mitarbeiter1Dropdown, mitarbeiter2Dropdown);
+    });
 
     let cmsById = {};
     cms.forEach(cm => cmsById[cm.getId()] = cm.getName());
+    cmsById = Object.fromEntries(Object.entries(cmsById).filter(([key]) => !blacklistCMs.includes(key)));
+
     let cmDropdown = new Dropdown({
         data: cmsById,
         placeholder: "z.B. Kasse 1"
@@ -452,6 +476,35 @@ function addShiftPopup(begin, end, shift, isEdit) {
         new ElementBuilder("button").cssClass("hover-effect-zoom").children("Speichern").onclick(saveFunction),
         new ElementBuilder("button").cssClass("hover-effect-zoom").children("Abbrechen").onclick(closeFunction),
     ).build());
+}
+
+function resolveBlacklists(shift, begin) {
+    let blacklistMitarbeiter = [];
+    let blacklistCMs = [];
+
+    shifts.forEach(oldShift => {
+        if (oldShift.getReferenceDate() == formatDate(begin)) {
+            let oldShiftBegin = new Date();
+            oldShiftBegin.setHours(oldShift.getBegin().substring(0, 2), oldShift.getBegin().substring(3, oldShift.getBegin().length));
+
+            let oldShiftEnd = new Date();
+            oldShiftEnd.setHours(oldShift.getEnd().substring(0, 2), oldShift.getEnd().substring(3, oldShift.getEnd().length));
+
+            let newShiftBegin = new Date();
+            newShiftBegin.setHours(shift.getBegin().substring(0, 2), shift.getBegin().substring(3, shift.getBegin().length));
+
+            let newShiftEnd = new Date();
+            newShiftEnd.setHours(shift.getEnd().substring(0, 2), shift.getEnd().substring(3, shift.getEnd().length));
+
+
+            if ((oldShiftBegin < newShiftBegin && oldShiftEnd > newShiftBegin) ||
+                newShiftEnd > oldShiftBegin && newShiftEnd < oldShiftEnd) {
+                blacklistMitarbeiter = blacklistMitarbeiter.concatIfNotNull(oldShift.getMitarbeiter());
+                blacklistCMs = blacklistCMs.concatIfNotNull(oldShift.getCM());
+            }
+        }
+    });
+    return [blacklistMitarbeiter, blacklistCMs];
 }
 
 function saveShift(shift, begin, end, isEdit) {

@@ -13,7 +13,7 @@ function Dropdown(_config) {
   var timeOut;
   var input = document.createElement("input");
   input.addEventListener("change", function (event) {
-    if(isEmpty(this.value)){
+    if (isEmpty(this.value)) {
       currentValue = undefined;
     }
 
@@ -34,6 +34,25 @@ function Dropdown(_config) {
   }
   var options = document.createElement("div");
   options.classList.add("dropdownlist");
+
+  this.setData = function (data) {
+    self.setItems(data);
+  }
+
+  this.setItems = function (data) {
+    children = data;
+    options.innerHTML = null;
+
+    for (let [key, value] of Object.entries(children)) {
+      var p = document.createElement("p");
+      p.innerHTML = value;
+      p.id = "ID_" + key;
+      options.appendChild(p);
+    }
+
+    this.currentitem = options.children.length > 0 ? options.children[0] : null;
+    bindEvents();
+  }
 
   for (let [key, value] of Object.entries(children)) {
     var p = document.createElement("p");
@@ -131,49 +150,52 @@ function Dropdown(_config) {
     document.addEventListener('click', outsideClickListener)
   }
 
-  // Get Items
-  this.listitems = this.dropdownlist.getElementsByTagName('p');
-  for (var i = 0; i < this.listitems.length; i++) {
-    // Binding Click Event
-    this.listitems[i].onclick = function () {
-      currentValue = this.id.replace("ID_", "");
-      var upv = this.innerHTML;
-      upv = upv.replace(/\<b\>/ig, '');
-      upv = upv.replace(/\<\/b\>/ig, '');
-      input.value = upv;
+  function bindEvents() {
+    // Get Items
+    self.listitems = self.dropdownlist.getElementsByTagName('p');
+    for (var i = 0; i < self.listitems.length; i++) {
+      // Binding Click Event
+      self.listitems[i].onclick = function () {
+        currentValue = this.id.replace("ID_", "");
+        var upv = this.innerHTML;
+        upv = upv.replace(/\<b\>/ig, '');
+        upv = upv.replace(/\<\/b\>/ig, '');
+        input.value = upv;
 
-      var evt = document.createEvent("HTMLEvents");
-      evt.initEvent("change", false, true);
-      input.dispatchEvent(evt);
-      noValue = false;
+        var evt = document.createEvent("HTMLEvents");
+        evt.initEvent("change", false, true);
+        input.dispatchEvent(evt);
+        noValue = false;
 
-      setVisible(false);
-      for (var j = 0; j < self.listitems.length; j++) {
-        self.listitems[j].removeAttribute("data-attribute");
-      }
+        setVisible(false);
+        for (var j = 0; j < self.listitems.length; j++) {
+          self.listitems[j].removeAttribute("data-attribute");
+        }
 
-      if (!isEmpty(self._metaName)) {
-        this.setAttribute("data-attribute", self._metaName);
-      }
-      return false;
-    };
-    // Binding OnMouseOver Event
-    this.listitems[i].onmouseover = function (e) {
-      for (var i = 0; i < self.listitems.length; i++) {
-        if (this === self.listitems[i]) {
-          if (self.currentitem) {
-            self.currentitem.className = self.currentitem.className.replace(
-              /light/g,
-              ''
-            );
+        if (!isEmpty(self._metaName)) {
+          this.setAttribute("data-attribute", self._metaName);
+        }
+        return false;
+      };
+      // Binding OnMouseOver Event
+      self.listitems[i].onmouseover = function (e) {
+        for (var i = 0; i < self.listitems.length; i++) {
+          if (this === self.listitems[i]) {
+            if (self.currentitem) {
+              self.currentitem.className = self.currentitem.className.replace(
+                /light/g,
+                ''
+              );
+            }
+            self.currentitem = self.listitems[i];
+            self.currentitemindex = i;
+            self.currentitem.className += ' light';
           }
-          self.currentitem = self.listitems[i];
-          self.currentitemindex = i;
-          self.currentitem.className += ' light';
         }
       }
     }
   }
+  bindEvents();
 
   this.build = function () {
     if (isSmall) {
@@ -222,7 +244,7 @@ function Dropdown(_config) {
   }
 
   this.getValue = function () {
-    if(noValue){
+    if (noValue) {
       return null;
     }
     if (!isEmpty(currentValue)) {
