@@ -164,15 +164,19 @@ body:has(.alert) .content {
 .header-user-box .search-icon {
     background-color: var(--opacity-white-color);
     border-radius: 100%;
+    min-height: 36px;
+    min-width: 36px;
 }
 
 .header-user-box .user-icon img {
     height: 100%;
+    width: 100%;
     padding: 0.3rem;
 }
 
 .header-user-box .search-icon img {
     height: 100%;
+    width: 100%;
     padding: 0.5rem;
 }
 
