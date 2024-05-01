@@ -515,6 +515,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
         if (blacklistCMs.includes(cmDropdown.getValue())) {
             oldCM = cms[cmDropdown.getValue()].getName();
             cmDropdown.setValue();
+            shift.setCM();
         }
         cmDropdown.setItems(cmsById);
 
@@ -532,14 +533,24 @@ function addShiftPopup(begin, end, shift, isEdit) {
             firstTime = false;
             return;
         }
-
-        let message = (messages.length > 1 ? "Die Mitarbeiter" : "Der Mitarbeiter") + " <b>";
-        message += messages.join(", ") + "</b><br>";
+        let message;
+        if(messages.length > 0 ){
+            message = (messages.length > 1 ? "Die Mitarbeiter" : "Der Mitarbeiter") + " <b>";
+            message += messages.join(", ") + "</b><br>";    
+        }
         if(!isEmpty(oldCM)){
             message += "und die CM <b>" + oldCM + "</b><br>";
         }
-        message += (messages.length > 1 || !isEmpty(oldCM) ? "können" : "kann") + " zu dieser Uhrzeit/ an diesem Wochentag<br>nicht erneut eingeteil werden";
-        showAlert("error", message, true, () => {}, () => {}, "OK", "", true)
+        if(!isEmpty(message)){
+            message += (messages.length > 1 || !isEmpty(oldCM) ? "können" : "kann") + " zu dieser Uhrzeit/ an diesem Wochentag<br>nicht erneut eingeteil werden";
+            showAlert("error", message, true, () => {}, () => {}, "OK", "", true)    
+        }
+
+        let newMitarbeiter = [].concatIfNotNull(mitarbeiter1Dropdown.getValue())
+        .concatIfNotNull(mitarbeiter2Dropdown.getValue())
+        .concatIfNotNull(mitarbeiter3Dropdown.getValue());
+
+        shift.setMitarbeiter(newMitarbeiter);
     }
 }
 
@@ -562,8 +573,8 @@ function resolveBlacklists(shift, begin) {
             newShiftEnd.setHours(shift.getEnd().substring(0, 2), shift.getEnd().substring(3, shift.getEnd().length));
 
 
-            if ((oldShiftBegin < newShiftBegin && oldShiftEnd > newShiftBegin) ||
-                newShiftEnd > oldShiftBegin && newShiftEnd < oldShiftEnd) {
+            if ((oldShiftBegin <= newShiftBegin && oldShiftEnd >= newShiftBegin) ||
+                newShiftEnd >= oldShiftBegin && newShiftEnd <= oldShiftEnd) {
                 blacklistMitarbeiter = blacklistMitarbeiter.concatIfNotNull(oldShift.getMitarbeiter());
                 blacklistCMs = blacklistCMs.concatIfNotNull(oldShift.getCM());
             }
