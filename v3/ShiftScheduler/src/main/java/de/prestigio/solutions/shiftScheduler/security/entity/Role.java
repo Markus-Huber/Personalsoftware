@@ -1,20 +1,23 @@
 package de.prestigio.solutions.shiftScheduler.security.entity;
 
-import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 
-@Data
-@Entity
-@Table(name = "roles")
 public class Role implements GrantedAuthority {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
 
-    @Column(name = "authority")
+    /** Die Security Rollen im Schichtplaner */
+    enum Rolle {
+        ROLE_ADMIN,
+        ROLE_USER
+    }
+
     @Getter
-    private String authority = "ROLE_ADMIN";
+    private final String authority;
+
+    public static final Role ROLE_ADMIN = new Role(Rolle.ROLE_ADMIN);
+    public static final Role ROLE_USER = new Role(Rolle.ROLE_USER);
+
+    private Role(Rolle role){
+        this.authority = role.toString();
+    }
 }

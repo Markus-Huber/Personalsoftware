@@ -10,7 +10,6 @@ public class WelcomeController {
 	@Secured("ROLE_ADMIN")
 	@GetMapping("/")
 	public String index() {
-		return "Greetings from Spring Boot!";
+		return "It works!";
 	}
-
 }

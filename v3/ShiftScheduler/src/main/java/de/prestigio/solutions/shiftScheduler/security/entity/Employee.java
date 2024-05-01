@@ -1,19 +1,17 @@
 package de.prestigio.solutions.shiftScheduler.security.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Entity
-@Table(name = "user")
+@Table(name = "employee")
 public class Employee implements UserDetails {
 
     @Id
@@ -21,8 +19,20 @@ public class Employee implements UserDetails {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "isAdmin", nullable = false)
+    private Boolean isAdmin = Boolean.FALSE;
+
+    @Column(name = "isActive")
+    //TODO: Default: false
+    private Boolean isActive = Boolean.TRUE;
+
+    @Column(name = "loginCounter")
+    private Integer loginCounter = 0;
+
+    @Column(name = "workingHours")
+    private Integer workingHours;
+
     @Column(name = "password", nullable = false)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     /*@ManyToMany(fetch = FetchType.EAGER)
@@ -44,31 +54,37 @@ public class Employee implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new Role());
+        if(isAdmin){
+            return List.of(Role.ROLE_ADMIN);
+        }
+        return List.of(Role.ROLE_USER);
     }
 
     @Override
     public String getUsername() {
-        return getEmail();
+        if(StringUtils.hasText(lastName)){
+            return firstName + " " + lastName;
+        }
+        return firstName;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return getIsActive();
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return getIsActive();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return getIsActive();
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return getIsActive();
     }
 }
