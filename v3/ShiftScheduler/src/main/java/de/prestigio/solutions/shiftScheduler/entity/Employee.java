@@ -3,6 +3,8 @@ package de.prestigio.solutions.shiftScheduler.entity;
 import de.prestigio.solutions.shiftScheduler.security.config.Role;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
@@ -10,7 +12,8 @@ import org.springframework.util.StringUtils;
 import java.util.Collection;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "employee")
 public class Employee implements UserDetails {
@@ -27,14 +30,14 @@ public class Employee implements UserDetails {
     private Boolean isAdmin = Boolean.FALSE;
 
     @Column(name = "isActive")
-    //TODO: Default: false
-    private Boolean isActive = Boolean.TRUE;
+    private Boolean isActive = Boolean.FALSE;
 
     @Column(name = "loginCounter")
     private Integer loginCounter = 0;
 
-    @Column(name = "workingHours")
-    private Integer workingHours;
+    @ManyToOne
+    @JoinColumn(name = "workingHours")
+    private Workinghours workingHours;
 
     @Column(name = "password", nullable = false)
     private String password;

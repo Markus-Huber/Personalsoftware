@@ -1,6 +1,7 @@
 package de.prestigio.solutions.shiftScheduler.entity.dto;
 
 import de.prestigio.solutions.shiftScheduler.entity.Employee;
+import de.prestigio.solutions.shiftScheduler.entity.Workinghours;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,13 +11,13 @@ import lombok.NoArgsConstructor;
 @Data
 public class EmployeeDTO {
     private Long id;
-    private Integer workingHours;
+    private WorkinghoursDTO workingHours;
     private String email;
     private String firstName;
     private String lastName;
 
     public static EmployeeDTO convert(final Employee employee) {
-        return new EmployeeDTO(employee.getId(), employee.getWorkingHours(),
+        return new EmployeeDTO(employee.getId(), WorkinghoursDTO.convert(employee.getWorkingHours()),
                 employee.getEmail(), employee.getFirstName(), employee.getLastName());
     }
 }
