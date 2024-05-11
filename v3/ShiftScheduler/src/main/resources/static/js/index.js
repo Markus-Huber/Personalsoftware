@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function () {
     content = document.getElementsByClassName("content")[0];
     new xmlHttpRequestHelper("./api/admin/employee", "standort=" + standort, true, true, (mitarbeiterRaw) => {
         mitarbeiter = Mitarbeiter.marshall(mitarbeiterRaw);
-        console.log(mitarbeiter);
         new xmlHttpRequestHelper("./api/cm", "", true, true, (cmsRaw) => {
             cms = CM.marshall(cmsRaw);
             // Wir brauchen die CMS, um die Schichten zu laden und zu rendern
@@ -21,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             new xmlHttpRequestHelper("./api/admin/workingHours", "", true, true, (wHsRaw) => {
                 workingHours = WorkingHour.marshall(wHsRaw);
-                new xmlHttpRequestHelper("src/php/requestStandorte.php", "", true, true, (standortRaw) => {
+                new xmlHttpRequestHelper("./api/admin/standort", "", true, true, (standortRaw) => {
                     standorte = Standort.marshall(standortRaw);
                 });
             });
