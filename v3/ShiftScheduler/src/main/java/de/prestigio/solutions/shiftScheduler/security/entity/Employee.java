@@ -19,6 +19,9 @@ public class Employee implements UserDetails {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "login", nullable = false)
+    private String login;
+
     @Column(name = "isAdmin", nullable = false)
     private Boolean isAdmin = Boolean.FALSE;
 

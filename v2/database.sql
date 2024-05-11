@@ -39,6 +39,7 @@ create table standort(
 
 CREATE TABLE employee (
   id 				int 			NOT NULL 	PRIMARY KEY AUTO_INCREMENT,
+  login 	 		varchar(255)  	NULL 	UNIQUE, 
   isAdmin 			tinyint 					DEFAULT '0',
   isActive 			tinyint 					DEFAULT '1',
   loginCounter 		int 						DEFAULT '0',
@@ -88,6 +89,8 @@ INSERT INTO employee (firstName, lastName, password)
 VALUES ('Jessica','T', '$2a$10$L/vx2GUxssWS0yuvDVSF4uK0YG55CkFayJKKdfv/Xyw3/gWP.830m');
 INSERT INTO employee (firstName, password)
 VALUES ('Alili','$2a$10$L/vx2GUxssWS0yuvDVSF4uK0YG55CkFayJKKdfv/Xyw3/gWP.830m'),('Mikolaj','$2a$10$L/vx2GUxssWS0yuvDVSF4uK0YG55CkFayJKKdfv/Xyw3/gWP.830m'),('Sophia','$2a$10$L/vx2GUxssWS0yuvDVSF4uK0YG55CkFayJKKdfv/Xyw3/gWP.830m'),('Joel','$2a$10$L/vx2GUxssWS0yuvDVSF4uK0YG55CkFayJKKdfv/Xyw3/gWP.830m'),('Sina','$2a$10$L/vx2GUxssWS0yuvDVSF4uK0YG55CkFayJKKdfv/Xyw3/gWP.830m'),('Haack','$2a$10$L/vx2GUxssWS0yuvDVSF4uK0YG55CkFayJKKdfv/Xyw3/gWP.830m'),('Monika','$2a$10$L/vx2GUxssWS0yuvDVSF4uK0YG55CkFayJKKdfv/Xyw3/gWP.830m'),('Kevin','$2a$10$L/vx2GUxssWS0yuvDVSF4uK0YG55CkFayJKKdfv/Xyw3/gWP.830m'),('Wimberger','$2a$10$L/vx2GUxssWS0yuvDVSF4uK0YG55CkFayJKKdfv/Xyw3/gWP.830m'),('Kostorz','$2a$10$L/vx2GUxssWS0yuvDVSF4uK0YG55CkFayJKKdfv/Xyw3/gWP.830m');
+
+update employee set login = LOWER(firstName);
 
 INSERT INTO division(name, color)
 VALUES('Kasse 1', '#006400'),('Kasse 2','#556B2F'),('Kasse 3','#C0FF3E'),('Kasse 4', '#CAFF70'),('Zureicher','#FFA500'),('TL','#FAFAD2'),('Reingigung 1', '#104E8B'),('Reingigung 2','#6495ED');
