@@ -15,9 +15,4 @@ public class EmployeeController {
 	@Autowired
 	EmployeeService employeeService;
 
-	@RoleAdmin
-	@PostMapping
-	public List<EmployeeDTO> findEmployees(@RequestParam("standort") String standort) {
-		return employeeService.findActiveEmployeesByStandort(standort);
-	}
 }

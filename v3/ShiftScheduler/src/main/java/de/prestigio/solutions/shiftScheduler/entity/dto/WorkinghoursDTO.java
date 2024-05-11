@@ -14,7 +14,10 @@ public class WorkinghoursDTO {
     private String name;
     private BigDecimal bdPrice;
 
-    public static WorkinghoursDTO convert(final Workinghours workinghours){
+    public static WorkinghoursDTO convert(final Workinghours workinghours) {
+        if (workinghours == null) {
+            return null;
+        }
         return new WorkinghoursDTO(workinghours.getId(), workinghours.getName(), workinghours.getBdPrice());
     }
 }

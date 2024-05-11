@@ -22,7 +22,7 @@ function showMitarbeiter() {
         new ElementBuilder("tr").children(
             new ElementBuilder("td"),
             new ElementBuilder("td").attribute("colspan", 4).children(
-                new ElementBuilder("img").onclick(() => addMitarbeiterPopup()).cssClass("basic-data-table-add").attribute("src", "src/img/icon/add.png")
+                new ElementBuilder("img").onclick(() => addMitarbeiterPopup()).cssClass("basic-data-table-add").attribute("src", "./img/icon/add.png")
             )
         ).parent(dataRow).build();
 

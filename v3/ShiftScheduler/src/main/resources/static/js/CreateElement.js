@@ -181,7 +181,7 @@ class ElementBuilder {
      */
     icon(_icon) {
         if (!isEmpty(_icon)) {
-            this.m_ChildElement.style.backgroundImage = "url('./src/image/" + _icon + "')";
+            this.m_ChildElement.style.backgroundImage = "url('./img/" + _icon + "')";
         }
         return this;
     }
@@ -411,7 +411,7 @@ function showAlert(type, message, modal, okCallback, abortCallback, okMessage = 
     let contentWrapper = new ElementBuilder("div").cssClass("content-wrapper").parent(popupContent)
     let image = new ElementBuilder("img").cssClass("type");
     if (type == "warning") {
-        image.attribute("src", "src/img/icon/warning.PNG");
+        image.attribute("src", "./img/icon/warning.PNG");
     }
     contentWrapper.children(image, new ElementBuilder("div").cssClass("message-wrapper").children(
         new ElementBuilder("div").cssClass("message").children(message)
