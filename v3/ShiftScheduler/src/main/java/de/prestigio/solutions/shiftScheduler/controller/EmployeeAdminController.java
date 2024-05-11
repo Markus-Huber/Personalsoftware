@@ -20,7 +20,7 @@ public class EmployeeAdminController {
 
 	@RoleAdmin
 	@PostMapping
-	public List<EmployeeDTO> findActiveEmployeesByStandort(@RequestParam("standort") String standort) {
+	public List<EmployeeDTO> findActiveEmployeesByStandort(@RequestParam("standort") Long standort) {
 		return employeeService.findActiveEmployeesByStandort(standort);
 	}
 }

@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -25,5 +23,5 @@ public class Workinghours {
     private Boolean isActive = Boolean.TRUE;
 
     @Column(name = "hours", precision = 4, scale = 2, columnDefinition="DECIMAL(4,2)")
-    private BigDecimal bdPrice;
+    private BigDecimal hours;
 }

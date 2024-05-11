@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Wir brauchen die CMS, um die Schichten zu laden und zu rendern
             showShift();
 
-            new xmlHttpRequestHelper("src/php/requestWorkingHours.php", "", true, true, (wHsRaw) => {
+            new xmlHttpRequestHelper("./api/admin/workingHours", "", true, true, (wHsRaw) => {
                 workingHours = WorkingHour.marshall(wHsRaw);
                 new xmlHttpRequestHelper("src/php/requestStandorte.php", "", true, true, (standortRaw) => {
                     standorte = Standort.marshall(standortRaw);

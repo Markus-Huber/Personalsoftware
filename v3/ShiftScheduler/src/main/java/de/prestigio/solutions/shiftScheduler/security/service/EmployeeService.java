@@ -15,7 +15,7 @@ public class EmployeeService {
     @Autowired
     EmployeeRepository employeeRepository;
 
-    public List<EmployeeDTO> findActiveEmployeesByStandort(final String Standort){
+    public List<EmployeeDTO> findActiveEmployeesByStandort(final Long Standort){
         return employeeRepository.findActiveEmployeesByStandort(Standort).stream().map(EmployeeDTO::convert).toList();
     }
 }

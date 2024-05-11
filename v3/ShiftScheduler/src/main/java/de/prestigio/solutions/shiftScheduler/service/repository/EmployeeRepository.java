@@ -11,7 +11,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     Optional<Employee> findByLogin(String login);
 
-    @Query(value="from Employee where isActive = true")
-    //@Query("select from Employee where isActive = 1 and id in (select employee from employeestandort where standort = ?1)")
-    List<Employee> findActiveEmployeesByStandort(String standort);
+    @Query(value="from Employee where isActive = true and id in (select employee.id from EmployeeStandort where standort.id = ?1)")
+    List<Employee> findActiveEmployeesByStandort(Long standort);
 }
