@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -41,4 +42,7 @@ public class Shift {
     @ManyToOne
     @JoinColumn(name = "division")
     private Division division;
+
+    @OneToMany
+    private List<EmployeeShift> employeeShifts;
 }

@@ -1,0 +1,31 @@
+package de.prestigio.solutions.shiftScheduler.controller;
+
+import de.prestigio.solutions.shiftScheduler.entity.dto.EmployeeDTO;
+import de.prestigio.solutions.shiftScheduler.entity.dto.ShiftDTO;
+import de.prestigio.solutions.shiftScheduler.security.config.RoleAdmin;
+import de.prestigio.solutions.shiftScheduler.security.service.ShiftService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/admin/shift")
+public class ShiftAdminController {
+
+    @Autowired
+    ShiftService shiftService;
+
+    @RoleAdmin
+    @PostMapping
+    public List<ShiftDTO> findShiftsBetween(@RequestParam("from") String from, @RequestParam("till") String till) throws ParseException {
+        return shiftService.findShiftsBetween(LocalDate.parse(from), LocalDate.parse(till));
+    }
+}

@@ -102,7 +102,7 @@ function showShift() {
                 checkOverlap();
                 return;
             }
-            new xmlHttpRequestHelper("src/php/requestShift.php", "from=" + fromString + "&till=" + tillString, true, true, (shiftsRaw) => {
+            new xmlHttpRequestHelper("./api/admin/shift", "from=" + fromString + "&till=" + tillString, true, true, (shiftsRaw) => {
                 shifts = Shift.marshall(shiftsRaw);
                 fromTills[fromString + tillString] = true;
                 shifts.forEach(shift => addEvent(shift));
