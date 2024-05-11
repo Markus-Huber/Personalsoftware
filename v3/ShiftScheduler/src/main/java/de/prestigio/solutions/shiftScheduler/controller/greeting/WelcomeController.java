@@ -1,4 +1,4 @@
-package de.prestigio.solutions.shiftScheduler.rest.greeting;
+package de.prestigio.solutions.shiftScheduler.controller.greeting;
 
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
