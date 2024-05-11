@@ -1,5 +1,6 @@
-package de.prestigio.solutions.shiftScheduler.security.entity;
+package de.prestigio.solutions.shiftScheduler.entity;
 
+import de.prestigio.solutions.shiftScheduler.security.config.Role;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;

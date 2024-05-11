@@ -1,4 +1,4 @@
-package de.prestigio.solutions.shiftScheduler.security.entity;
+package de.prestigio.solutions.shiftScheduler.security.config;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

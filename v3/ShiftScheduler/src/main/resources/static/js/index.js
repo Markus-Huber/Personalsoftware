@@ -11,8 +11,9 @@ let standorte = [];
 
 document.addEventListener('DOMContentLoaded', function () {
     content = document.getElementsByClassName("content")[0];
-    new xmlHttpRequestHelper("src/php/requestMitarbeiter.php", "standort=" + standort, true, true, (mitarbeiterRaw) => {
+    new xmlHttpRequestHelper("./api/employee", "standort=" + standort, true, true, (mitarbeiterRaw) => {
         mitarbeiter = Mitarbeiter.marshall(mitarbeiterRaw);
+        console.log(mitarbeiter);
         new xmlHttpRequestHelper("src/php/requestCM.php", "", true, true, (cmsRaw) => {
             cms = CM.marshall(cmsRaw);
             // Wir brauchen die CMS, um die Schichten zu laden und zu rendern
