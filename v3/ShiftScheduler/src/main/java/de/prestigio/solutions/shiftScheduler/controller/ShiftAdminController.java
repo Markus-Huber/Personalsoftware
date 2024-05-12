@@ -1,19 +1,15 @@
 package de.prestigio.solutions.shiftScheduler.controller;
 
-import de.prestigio.solutions.shiftScheduler.entity.dto.EmployeeDTO;
+import de.prestigio.solutions.shiftScheduler.entity.dto.SaveShiftDTO;
 import de.prestigio.solutions.shiftScheduler.entity.dto.ShiftDTO;
+import de.prestigio.solutions.shiftScheduler.entity.dto.TestDTO;
 import de.prestigio.solutions.shiftScheduler.security.config.RoleAdmin;
 import de.prestigio.solutions.shiftScheduler.security.service.ShiftService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -27,5 +23,17 @@ public class ShiftAdminController {
     @PostMapping
     public List<ShiftDTO> findShiftsBetween(@RequestParam("from") String from, @RequestParam("till") String till) throws ParseException {
         return shiftService.findShiftsBetween(LocalDate.parse(from), LocalDate.parse(till));
+    }
+
+    @RoleAdmin
+    @PostMapping("create")
+    public ShiftDTO createShift(@RequestBody final SaveShiftDTO shift){
+        return shiftService.createShift(shift);
+    }
+
+    @RoleAdmin
+    @PostMapping("test")
+    public void test(@RequestBody TestDTO testParam){
+        System.out.println(testParam);
     }
 }

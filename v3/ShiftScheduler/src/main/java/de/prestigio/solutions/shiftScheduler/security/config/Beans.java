@@ -22,7 +22,7 @@ public class Beans {
             builder.serializerByType(LocalDate.class, new LocalDateSerializer(localDateFormatter));
             builder.deserializerByType(LocalDate.class, new LocalDateDeserializer(localDateFormatter));
 
-            DateTimeFormatter localDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            DateTimeFormatter localDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
             builder.serializerByType(LocalDateTime.class, new LocalDateTimeSerializer(localDateTimeFormatter));
             builder.deserializerByType(LocalDateTime.class, new LocalDateTimeDeserializer(localDateTimeFormatter));
         };

@@ -36,7 +36,7 @@ Date.prototype.standardIime = function () {
 const isVisible = elem => !!elem && !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
 
 /**
- * Diese Methode prüft gänige HTMl Elemente, ob sie leer sind.
+ * Diese Methode prüft gängige HTMl Elemente, ob sie leer sind.
  * Strings, Objekte, JSON Arrays, Arrays, gültige HTML Elemente.
  * 
  * Prüft auf null, undefined und bei Strings auf die getrimmte Länge
@@ -100,10 +100,23 @@ function getUniqueid() {
     return Date.now().toString(36) + Math.floor(Math.pow(10, 12) + Math.random() * 9 * Math.pow(10, 12)).toString(36);
 }
 
+function isJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
 function xmlHttpRequestHelper(requestURL, params, isPost, isAsync, successCallback, errorCallback) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open(isPost ? "POST" : "GET", requestURL, isAsync);
-    xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    if(isJsonString(params)){
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+    }else{
+        xmlhttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    }
     if (isEmpty(params)) {
         xmlhttp.send();
     } else {

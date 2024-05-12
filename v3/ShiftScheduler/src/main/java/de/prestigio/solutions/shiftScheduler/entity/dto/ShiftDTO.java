@@ -1,12 +1,10 @@
 package de.prestigio.solutions.shiftScheduler.entity.dto;
 
-import de.prestigio.solutions.shiftScheduler.entity.Division;
-import de.prestigio.solutions.shiftScheduler.entity.EmployeeShift;
 import de.prestigio.solutions.shiftScheduler.entity.Shift;
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +17,8 @@ public class ShiftDTO {
     private LocalDate referenceDate;
     private DivisionDTO cm;
     private List<EmployeeDTO> mitarbeiter = new ArrayList<>();
-    private Instant begin;
-    private Instant end;
+    private String begin;
+    private String end;
 
     public static ShiftDTO convert(final Shift shift) {
         if (shift == null) {
@@ -30,10 +28,12 @@ public class ShiftDTO {
         ret.setId(shift.getId());
         ret.setReferenceDate(shift.getScheduledDate());
         ret.setCm(DivisionDTO.convert(shift.getDivision()));
-        ret.setMitarbeiter(
-                shift.getEmployeeShifts().stream().map(EmployeeShift::getEmployee).map(EmployeeDTO::convert).toList());
-        ret.setBegin(shift.getBegin());
-        ret.setEnd(shift.getEnd());
+        if (shift.getEmployees() != null) {
+            ret.setMitarbeiter(
+                    shift.getEmployees().stream().map(EmployeeDTO::convert).toList());
+        }
+        ret.setBegin(shift.getBegin().toLocalTime().toString());
+        ret.setEnd(shift.getEnd().toLocalTime().toString());
         return ret;
     }
 }

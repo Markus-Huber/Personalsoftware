@@ -1,75 +1,74 @@
 class Shift {
 
     constructor(id, weekday, begin, end, cm, mitarbeiter, referenceDate) {
-        this._id = id;
-        this._weekday = weekday;
-        this._begin = begin;
-        this._end = end;
-        this._cm = cm;
-        this._mitarbeiter = [];
+        this.id = id;
+        this.weekday = weekday;
+        this.begin = begin;
+        this.end = end;
+        this.cm = cm;
+        this.mitarbeiter = [];
         this.setMitarbeiter(mitarbeiter);
-        this._referenceDate = referenceDate;
+        this.referenceDate = referenceDate;
     }
 
     getId() {
-        return this._id;
+        return this.id;
     }
 
     getWeekday() {
-        return this._weekday;
+        return this.weekday;
     }
 
     setWeekday(weekday) {
-        this._weekday = weekday;
+        this.weekday = weekday;
     }
 
     getBegin() {
-        return this._begin;
+        return this.begin;
     }
 
     setBegin(begin) {
-        this._begin = begin;
+        this.begin = begin;
     }
 
     getEnd() {
-        return this._end;
+        return this.end;
     }
 
     setEnd(end) {
-        this._end = end;
+        this.end = end;
     }
 
     getCM() {
-        return this._cm;
+        return this.cm;
     }
 
     setCM(cm) {
-        this._cm = cm;
+        this.cm = cm;
     }
 
     setReferenceDate(referenceDate) {
-        this._referenceDate = referenceDate;
+        this.referenceDate = referenceDate;
     }
 
     getReferenceDate() {
-        return this._referenceDate;
+        return this.referenceDate;
     }
 
     getMitarbeiter() {
-        return this._mitarbeiter;
+        return this.mitarbeiter;
     }
 
     setMitarbeiter(mitarbeiter) {
-        this._mitarbeiter = [].concatIfNotNull(mitarbeiter);
+        this.mitarbeiter = [].concatIfNotNull(mitarbeiter);
     }
 
     static marshall(data) {
         let ret = [];
         Object.values(data).forEach(element => {
             let mitarbeiter = element["mitarbeiter"];
-            if(!isEmpty(mitarbeiter)){
-                mitarbeiter = mitarbeiter.split(",");
-            };
+            mitarbeiter = mitarbeiter.map(mtb => Mitarbeiter.marshall(mtb));
+            mitarbeiter = mitarbeiter.filter(mitarbeiter => mitarbeiter);
             let weekday = element["weekday"];
             if(isEmpty(weekday) && !isEmpty(element["referenceDate"])){
                 weekday = new Date(element["referenceDate"]).getDay();
@@ -82,8 +81,13 @@ class Shift {
             if(end.length == 8 && end.indexOf(":", end.indexOf(":")+1) > 0){
                 end = end.substring(0, 5);
             }
+            let cm = [];
+            cm.push(element["cm"]);
+            cm = CM.marshall(cm)
+            cm = cm.filter(elem => elem);
+            cm = cm[0];
 
-            ret[element["id"]] = new Shift(element["id"], weekday, begin, end, element["cm"], mitarbeiter, element["referenceDate"]);
+            ret[element["id"]] = new Shift(element["id"], weekday, begin, end, cm, mitarbeiter, element["referenceDate"]);    
         });
         return ret;
     }
@@ -91,64 +95,64 @@ class Shift {
 
 class Weekday {
     constructor(id, name) {
-        this._id = id;
-        this._name = name;
+        this.id = id;
+        this.name = name;
     }
 
     getId() {
-        return this._id;
+        return this.id;
     }
 
     getName() {
-        return this._name;
+        return this.name;
     }
 }
 
 class Mitarbeiter {
     constructor(id, workingHours, firstName, lastName) {
-        this._id = id;
-        this._workingHours = workingHours;
-        this._firstName = firstName;
-        this._lastName = lastName;
+        this.id = id;
+        this.workingHours = workingHours;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
-    _standorte = [];
+    standorte = [];
 
     getId() {
-        return this._id;
+        return this.id;
     }
 
     getWorkingHours() {
-        return this._workingHours;
+        return this.workingHours;
     }
 
     getFirstName() {
-        return this._firstName;
+        return this.firstName;
     }
 
     getLastName() {
-        return this._lastName;
+        return this.lastName;
     }
 
     getStandorte() {
-        return this._standorte;
+        return this.standorte;
     }
 
     resolveName() {
-        if (!isEmpty(this._firstName)) {
-            if (!isEmpty(this._lastName)) {
-                return this._firstName + " " + this._lastName;
+        if (!isEmpty(this.firstName)) {
+            if (!isEmpty(this.lastName)) {
+                return this.firstName + " " + this.lastName;
             }
-            return this._firstName;
+            return this.firstName;
         }
-        return this._lastName;
+        return this.lastName;
     }
 
     resolveShortName() {
-        if (!isEmpty(this._lastName)) {
-            return this._lastName;
+        if (!isEmpty(this.lastName)) {
+            return this.lastName;
         }
-        return this._firstName;
+        return this.firstName;
     }
 
     static marshall(data) {
@@ -162,21 +166,21 @@ class Mitarbeiter {
 
 class CM {
     constructor(id, name, color) {
-        this._id = id;
-        this._name = name;
-        this._color = color;
+        this.id = id;
+        this.name = name;
+        this.color = color;
     }
 
     getId() {
-        return this._id;
+        return this.id;
     }
 
     getName() {
-        return this._name;
+        return this.name;
     }
 
     getColor() {
-        return this._color;
+        return this.color;
     }
 
     static marshall(data) {
@@ -190,21 +194,21 @@ class CM {
 
 class WorkingHour {
     constructor(id, name, hours) {
-        this._id = id;
-        this._name = name;
-        this._hours = hours;
+        this.id = id;
+        this.name = name;
+        this.hours = hours;
     }
 
     getId() {
-        return this._id;
+        return this.id;
     }
 
     getName() {
-        return this._name;
+        return this.name;
     }
 
     getHours() {
-        return this._hours;
+        return this.hours;
     }
 
     static marshall(data) {
@@ -218,16 +222,16 @@ class WorkingHour {
 
 class Standort {
     constructor(id, name) {
-        this._id = id;
-        this._name = name;
+        this.id = id;
+        this.name = name;
     }
 
     getId() {
-        return this._id;
+        return this.id;
     }
 
     getName() {
-        return this._name;
+        return this.name;
     }
 
     static marshall(data) {

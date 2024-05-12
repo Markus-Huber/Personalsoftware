@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -25,16 +25,16 @@ public class Shift {
     private Boolean isActive = Boolean.TRUE;
 
     @Column(name = "startH", nullable = false)
-    private Instant begin;
+    private LocalDateTime begin;
 
     @Column(name = "endH", nullable = false)
-    private Instant end;
+    private LocalDateTime end;
 
     @Column(name = "breakIncluded", nullable = false)
     private Boolean breakIncluded = Boolean.FALSE;
 
     @Column(name = "breakH", nullable = false)
-    private Instant breakDuration;
+    private LocalDateTime breakDuration = LocalDateTime.now().withHour(0).withMinute(0);
 
     @Column(name = "scheduledDate", nullable = false)
     private LocalDate scheduledDate;
@@ -43,6 +43,10 @@ public class Shift {
     @JoinColumn(name = "division")
     private Division division;
 
-    @OneToMany
-    private List<EmployeeShift> employeeShifts;
+    @ManyToMany
+    @JoinTable(
+            name = "employeeshift",
+            joinColumns = @JoinColumn(name = "shift"),
+            inverseJoinColumns = @JoinColumn(name = "employee"))
+    private List<Employee> employees;
 }

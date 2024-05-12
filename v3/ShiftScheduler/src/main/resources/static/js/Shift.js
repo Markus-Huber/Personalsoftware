@@ -600,7 +600,10 @@ function saveShift(shift, begin, end, isEdit) {
             addEvent(shift, begin, end);
         }, (error) => showAlert("error", error, true, () => {}, () => {}, "OK", "", true));
     } else {
-        new xmlHttpRequestHelper("src/php/saveShift.php", "shift=" + JSON.stringify(shift), true, true, (shift) => {
+        shift.setBegin(shift.getReferenceDate() + " " + shift.getBegin());
+        shift.setEnd(shift.getReferenceDate() + " " + shift.getBegin());
+        
+        new xmlHttpRequestHelper("./api/admin/shift/create", JSON.stringify(shift), true, true, (shift) => {
             shift = Shift.marshall([].concat(shift));
             if (Object.values(shift).length != 1) {
                 console.error(shift);
@@ -614,11 +617,8 @@ function saveShift(shift, begin, end, isEdit) {
 }
 
 function addEvent(shift, begin = new Date(shift.getReferenceDate() + "T" + shift.getBegin()), end = new Date(shift.getReferenceDate() + "T" + shift.getEnd())) {
-    let mtbs = [];
-    shift.getMitarbeiter().forEach(id => {
-        mtbs.push(mitarbeiter[id].resolveName());
-    });
-    let cm = cms[shift.getCM()];
+    let mtbs = shift.getMitarbeiter().map(mitarbeiter => mitarbeiter.resolveName());
+    let cm = shift.getCM();
     calendar.addEvent({
         id: shift.getId(),
         title: cm.getName() + " (" + shift.getBegin() + " - " + shift.getEnd() + ")<br />" + mtbs.join(", "),
