@@ -1,6 +1,7 @@
 package de.prestigio.solutions.shiftScheduler.security.service;
 
 import de.prestigio.solutions.shiftScheduler.entity.Division;
+import de.prestigio.solutions.shiftScheduler.entity.Employee;
 import de.prestigio.solutions.shiftScheduler.entity.Shift;
 import de.prestigio.solutions.shiftScheduler.entity.dto.SaveShiftDTO;
 import de.prestigio.solutions.shiftScheduler.entity.dto.ShiftDTO;
@@ -32,6 +33,8 @@ public class ShiftService {
         Division division = new Division();
         division.setId(shiftDTO.getCm());
         shift.setDivision(division);
+
+        shift.setEmployees(shiftDTO.getMitarbeiter().stream().map(Employee::new).toList());
 
         shift = shiftRepository.save(shift);
         return ShiftDTO.convert(shift);

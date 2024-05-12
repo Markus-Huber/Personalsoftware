@@ -67,7 +67,7 @@ class Shift {
         let ret = [];
         Object.values(data).forEach(element => {
             let mitarbeiter = element["mitarbeiter"];
-            mitarbeiter = mitarbeiter.map(mtb => Mitarbeiter.marshall(mtb));
+            mitarbeiter = Mitarbeiter.marshall(mitarbeiter);
             mitarbeiter = mitarbeiter.filter(mitarbeiter => mitarbeiter);
             let weekday = element["weekday"];
             if(isEmpty(weekday) && !isEmpty(element["referenceDate"])){

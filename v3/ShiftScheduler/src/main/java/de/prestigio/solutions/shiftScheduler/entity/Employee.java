@@ -2,9 +2,7 @@ package de.prestigio.solutions.shiftScheduler.entity;
 
 import de.prestigio.solutions.shiftScheduler.security.config.Role;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
@@ -16,8 +14,9 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "employee")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Employee implements UserDetails {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -42,14 +41,6 @@ public class Employee implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
-    /*@ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "customer_role",
-            joinColumns = {@JoinColumn(name = "customer_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id")}
-    )
-    private Set<Role> authorities;*/
-
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
@@ -59,6 +50,9 @@ public class Employee implements UserDetails {
     @Column(name = "lastName")
     private String lastName;
 
+    public Employee(final Long id){
+        this.id = id;
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if(isAdmin){
