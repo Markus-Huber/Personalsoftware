@@ -601,7 +601,7 @@ function saveShift(shift, begin, end, isEdit) {
         }, (error) => showAlert("error", error, true, () => {}, () => {}, "OK", "", true));
     } else {
         shift.setBegin(shift.getReferenceDate() + " " + shift.getBegin());
-        shift.setEnd(shift.getReferenceDate() + " " + shift.getBegin());
+        shift.setEnd(shift.getReferenceDate() + " " + shift.getEnd());
         
         new xmlHttpRequestHelper("./api/admin/shift/create", JSON.stringify(shift), true, true, (shift) => {
             shift = Shift.marshall([].concat(shift));
