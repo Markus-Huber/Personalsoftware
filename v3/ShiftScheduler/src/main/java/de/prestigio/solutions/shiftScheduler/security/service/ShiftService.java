@@ -46,8 +46,7 @@ public class ShiftService {
         // Wird das Objekt, dass save zurückgibt direkt zurückgegeben, sind die ManyToOne Attribute (bis auf den PK)
         // alle null..
         entityManager.detach(shift);
-        shift = (Shift) entityManager.createQuery("from Shift where id = :id")
-                .setParameter("id", shift.getId()).getSingleResult();
+        shift = shiftRepository.findById(shift.getId()).orElseThrow(() -> new IllegalStateException("Schicht existiert nicht!"));
         return ShiftDTO.convert(shift);
     }
 }
