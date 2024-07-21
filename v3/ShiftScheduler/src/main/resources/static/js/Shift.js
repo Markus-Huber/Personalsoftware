@@ -628,10 +628,8 @@ function saveShift(shift, begin, end, isEdit) {
     shift.setEnd(shift.getReferenceDate() + " " + shift.getEnd());
 
     if (isEdit) {
-        console.log(shift.getMitarbeiter());
         shift.setMitarbeiter(shift.getMitarbeiter().map(arbeiter => arbeiter.getId ? arbeiter.getId() : arbeiter));
-        console.log(shift.getMitarbeiter());
-
+        shift.setCM(shift.getCM().getId ? shift.getCM().getId() : shift.getCM());
         new xmlHttpRequestHelper("./api/admin/shift/update", JSON.stringify(shift), true, true, (shift) => {
             shift = Shift.marshall([].concat(shift));
             if (Object.values(shift).length != 1) {

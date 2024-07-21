@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -48,5 +49,12 @@ public class Shift {
             name = "employeeshift",
             joinColumns = @JoinColumn(name = "shift"),
             inverseJoinColumns = @JoinColumn(name = "employee"))
-    private List<Employee> employees;
+    private List<Employee> employees = new ArrayList<>();
+
+    public void setEmployees(final List<Employee> employees){
+        this.employees.clear();
+        if(employees != null){
+            this.employees.addAll(employees);
+        }
+    }
 }
