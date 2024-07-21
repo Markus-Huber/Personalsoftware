@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -48,5 +49,31 @@ public class ShiftService {
         entityManager.detach(shift);
         shift = shiftRepository.findById(shift.getId()).orElseThrow(() -> new IllegalStateException("Schicht existiert nicht!"));
         return ShiftDTO.convert(shift);
+    }
+
+    public ShiftDTO updateShift(SaveShiftDTO shiftDTO) {
+        Shift shift = shiftRepository.findById(shiftDTO.getId())
+                .orElseThrow(() -> new IllegalStateException("Schicht existiert nicht!"));
+
+        shift.setBegin(shiftDTO.getBegin());
+        shift.setEnd(shiftDTO.getEnd());
+        shift.setScheduledDate(shiftDTO.getReferenceDate());
+
+        Division division = new Division();
+        division.setId(shiftDTO.getCm());
+        shift.setDivision(division);
+
+        shift.setEmployees(shiftDTO.getMitarbeiter().stream().map(Employee::new).toList());
+
+        shift = shiftRepository.save(shift);
+        // Wird das Objekt, dass save zurückgibt direkt zurückgegeben, sind die ManyToOne Attribute (bis auf den PK)
+        // alle null..
+        entityManager.detach(shift);
+        shift = shiftRepository.findById(shift.getId()).orElseThrow(() -> new IllegalStateException("Schicht existiert nicht!"));
+        return ShiftDTO.convert(shift);
+    }
+
+    public void deleteShift(final Long shiftId){
+        shiftRepository.deleteById(shiftId);
     }
 }

@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class SaveShiftDTO {
+    private Long id;
     private LocalDate referenceDate;
     private Long cm;
     private List<Long> mitarbeiter = new ArrayList<>();

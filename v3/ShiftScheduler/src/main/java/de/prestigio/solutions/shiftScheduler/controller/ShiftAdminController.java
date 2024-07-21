@@ -32,6 +32,18 @@ public class ShiftAdminController {
     }
 
     @RoleAdmin
+    @PostMapping("update")
+    public ShiftDTO updateShift(@RequestBody final SaveShiftDTO shift){
+        return shiftService.updateShift(shift);
+    }
+
+    @RoleAdmin
+    @PostMapping("delete")
+    public void deleteShift(@RequestParam("shiftID") Long shiftID) {
+        shiftService.deleteShift(shiftID);
+    }
+
+    @RoleAdmin
     @PostMapping("test")
     public void test(@RequestBody TestDTO testParam){
         System.out.println(testParam);

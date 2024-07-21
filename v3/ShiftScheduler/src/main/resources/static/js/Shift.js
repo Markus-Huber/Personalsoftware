@@ -309,7 +309,6 @@ function addShiftPopup(begin, end, shift, isEdit) {
             .concatIfNotNull(mitarbeiter2Dropdown.getValue())
             .concatIfNotNull(mitarbeiter3Dropdown.getValue());
 
-        console.log("mitarbeiterValueChange");
         dirty = true;
         shift.setMitarbeiter(mitarbeiter);
 
@@ -332,7 +331,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
     }).metaName("mitarbeiter").setValue(mitarbeiter1Value).changeListener(() => {
-        if(mitarbeiter1Dropdown.getValue() !== mitarbeiter1Value[0]){
+        if(mitarbeiter1Dropdown.getValue() !== mitarbeiter1Value?.[0]){
             mitarbeiterValueChange(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
         }
     });
@@ -349,7 +348,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
     }).metaName("mitarbeiter").setValue(mitarbeiter2Value).changeListener(() => {
-        if(mitarbeiter2Dropdown.getValue() !== mitarbeiter2Value[0]){
+        if(mitarbeiter2Dropdown.getValue() !== mitarbeiter2Value?.[0]){
             mitarbeiterValueChange(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
         }
     });
@@ -366,7 +365,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
     }).metaName("mitarbeiter").setValue(mitarbeiter3Value).changeListener(() => {
-        if(mitarbeiter3Dropdown.getValue() !== mitarbeiter3Value[0]){
+        if(mitarbeiter3Dropdown.getValue() !== mitarbeiter3Value?.[0]){
             mitarbeiterValueChange(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
         }
     });
@@ -388,7 +387,6 @@ function addShiftPopup(begin, end, shift, isEdit) {
         });
         shift.setWeekday(weekDay);
         if(initialWeekday != weekDay){
-            console.log("wochentagDropdown")
             dirty = true;
         }
         recalculateBlacklists(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
@@ -409,9 +407,8 @@ function addShiftPopup(begin, end, shift, isEdit) {
         data: cmsById,
         placeholder: "z.B. Kasse 1"
     }).metaName("cm").setValue(cmValue).changeListener((event, item) => {
-        if(cmDropdown.getValue() !== cmValue[0]){
+        if(cmDropdown.getValue() !== cmValue?.[0]){
             shift.setCM(Object.keys(item)[0]);
-            console.log("cm");
             dirty = true;
         }
     });
@@ -439,7 +436,6 @@ function addShiftPopup(begin, end, shift, isEdit) {
                                 if (/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
                                     shift.setBegin(value);
                                     begin.setHours(value.substring(0, 2), value.substring(3, value.length));
-                                    console.log("begin");
                                     dirty = true;
                                     recalculateBlacklists(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
                                 }
@@ -457,7 +453,6 @@ function addShiftPopup(begin, end, shift, isEdit) {
                                 if (/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
                                     shift.setEnd(value);
                                     end.setHours(value.substring(0, 2), value.substring(3, value.length));
-                                    console.log("end");
                                     dirty = true;
                                     recalculateBlacklists(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
                                 }
@@ -510,7 +505,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
     parent.appendChild(new ElementBuilder("div").cssClass("button-bar").children(
         isEdit ? new ElementBuilder("button").cssClass("hover-effect-zoom").children("Löschen").onclick(() => {
             showAlert("warning", "Wollen Sie diese Schicht wirklich löschen?<br>Diese Aktion kann nicht rückgängig gemacht werden!", true, () => {
-                new xmlHttpRequestHelper("src/php/deleteShift.php", "shift=" + shift.getId() + "&update=true", true, true, () => {
+                new xmlHttpRequestHelper("./api/admin/shift/delete", "shiftID=" + shift.getId(), true, true, () => {
                     parent.parentElement.removeChild(parent);
                     const event = new Event("popupClosed");
                     parent.dispatchEvent(event);
@@ -629,8 +624,15 @@ function resolveBlacklists(shift, begin) {
 
 function saveShift(shift, begin, end, isEdit) {
     shift.setReferenceDate(formatDate(begin));
+    shift.setBegin(shift.getReferenceDate() + " " + shift.getBegin());
+    shift.setEnd(shift.getReferenceDate() + " " + shift.getEnd());
+
     if (isEdit) {
-        new xmlHttpRequestHelper("src/php/saveShift.php", "shift=" + JSON.stringify(shift) + "&update=true", true, true, (shift) => {
+        console.log(shift.getMitarbeiter());
+        shift.setMitarbeiter(shift.getMitarbeiter().map(arbeiter => arbeiter.getId ? arbeiter.getId() : arbeiter));
+        console.log(shift.getMitarbeiter());
+
+        new xmlHttpRequestHelper("./api/admin/shift/update", JSON.stringify(shift), true, true, (shift) => {
             shift = Shift.marshall([].concat(shift));
             if (Object.values(shift).length != 1) {
                 console.error(shift);
@@ -644,9 +646,6 @@ function saveShift(shift, begin, end, isEdit) {
             addEvent(shift, begin, end);
         }, (error) => showAlert("error", error, true, () => {}, () => {}, "OK", "", true));
     } else {
-        shift.setBegin(shift.getReferenceDate() + " " + shift.getBegin());
-        shift.setEnd(shift.getReferenceDate() + " " + shift.getEnd());
-        
         new xmlHttpRequestHelper("./api/admin/shift/create", JSON.stringify(shift), true, true, (shift) => {
             shift = Shift.marshall([].concat(shift));
             if (Object.values(shift).length != 1) {
