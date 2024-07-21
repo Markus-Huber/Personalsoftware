@@ -109,6 +109,13 @@ function isJsonString(str) {
     return true;
 }
 
+function getType(p) {
+    if (Array.isArray(p)) return 'array';
+    else if (typeof p == 'string') return 'string';
+    else if (p != null && typeof p == 'object') return 'object';
+    else return 'other';
+}
+
 function xmlHttpRequestHelper(requestURL, params, isPost, isAsync, successCallback, errorCallback) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open(isPost ? "POST" : "GET", requestURL, isAsync);

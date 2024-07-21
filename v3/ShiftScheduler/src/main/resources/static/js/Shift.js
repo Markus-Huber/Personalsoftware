@@ -229,7 +229,7 @@ function checkOverlap() {
 
     setTimeout(() => {
         let shifts = document.getElementsByClassName("fc-timegrid-event");
-        for (i = 0; i < shifts.length; i++) {
+        for (let i = 0; i < shifts.length; i++) {
             shifts[i].title = shifts[i].getElementsByClassName("fc-event-main")[0].innerHTML.split("<br>").join("\n");
         }
     }, 500);
@@ -319,12 +319,13 @@ function addShiftPopup(begin, end, shift, isEdit) {
             return key != current.getValue() && key != other1.getValue() && !blacklistMitarbeiter.includes(key);
         })));
     };
-
-    let mitarbeiter1Value = Object.entries(mitarbeiterById)
-        .filter(entry => {
-            return entry[1] == shift.getMitarbeiter()[0]?.resolveName()
-        })
-        .map(entry => entry[0]);
+    let mitarbeiter1Value = getType(shift.getMitarbeiter()[0]) === 'object' 
+        ? Object.entries(mitarbeiterById)
+            .filter(entry => {
+                return entry[1] == shift.getMitarbeiter()[0]?.resolveName()
+            })
+            .map(entry => entry[0]) 
+        : shift.getMitarbeiter()[0];
 
     let mitarbeiter1Dropdown = new Dropdown({
         data: mitarbeiterById,
@@ -333,11 +334,13 @@ function addShiftPopup(begin, end, shift, isEdit) {
         mitarbeiterValueChange(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
     });
 
-    let mitarbeiter2Value = Object.entries(mitarbeiterById)
-        .filter(entry => {
-            return entry[1] == shift.getMitarbeiter()[1]?.resolveName()
-        })
-        .map(entry => entry[0]);
+    let mitarbeiter2Value = getType(shift.getMitarbeiter()[1]) === 'object' 
+        ? Object.entries(mitarbeiterById)
+            .filter(entry => {
+                return entry[1] == shift.getMitarbeiter()[1]?.resolveName()
+            })
+            .map(entry => entry[0]) 
+        : shift.getMitarbeiter()[1];
 
     let mitarbeiter2Dropdown = new Dropdown({
         data: mitarbeiterById,
@@ -346,11 +349,13 @@ function addShiftPopup(begin, end, shift, isEdit) {
         mitarbeiterValueChange(mitarbeiter2Dropdown, mitarbeiter1Dropdown, mitarbeiter3Dropdown);
     });
 
-    let mitarbeiter3Value = Object.entries(mitarbeiterById)
-        .filter(entry => {
-            return entry[1] == shift.getMitarbeiter()[2]?.resolveName()
-        })
-        .map(entry => entry[0]);
+    let mitarbeiter3Value = getType(shift.getMitarbeiter()[2]) === 'object' 
+        ? Object.entries(mitarbeiterById)
+            .filter(entry => {
+                return entry[1] == shift.getMitarbeiter()[2]?.resolveName()
+            })
+            .map(entry => entry[0]) 
+        : shift.getMitarbeiter()[2];
 
     let mitarbeiter3Dropdown = new Dropdown({
         data: mitarbeiterById,
@@ -383,11 +388,13 @@ function addShiftPopup(begin, end, shift, isEdit) {
     cms.forEach(cm => cmsById[cm.getId()] = cm.getName());
     cmsById = Object.fromEntries(Object.entries(cmsById).filter(([key]) => !blacklistCMs.includes(key)));
 
-    let cmValue = Object.entries(cmsById)
-        .filter(entry => {
-            return entry[1] == shift.getCM()?.getName();
-        })
-        .map(entry => entry[0]);
+    let cmValue = getType(shift.getCM()) === 'object' 
+        ? Object.entries(cmsById)
+            .filter(entry => {
+                return entry[1] == shift.getCM()?.getName();
+            })
+            .map(entry => entry[0])
+        : shift.getCM();
     let cmDropdown = new Dropdown({
         data: cmsById,
         placeholder: "z.B. Kasse 1"
