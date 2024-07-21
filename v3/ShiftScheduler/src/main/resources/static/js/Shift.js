@@ -296,27 +296,6 @@ function addShiftPopup(begin, end, shift, isEdit) {
         }
     })
 
-    let wochentagDropdown = new Dropdown({
-        data: weekDaysById,
-        placeholder: "z.B. " + weekDaysById[Object.keys(weekDaysById)[0]]
-    }).metaName("wochentag").setValue(initialWeekday).changeListener((event, item) => {
-        let weekDay = Object.keys(item)[0];
-        let dates = resolveDateRange(from, till);
-        dates.forEach(date => {
-            if ((date.getDay() - 1) == weekDay) {
-                date.setHours(shift.getBegin().substring(0, 2), shift.getBegin().substring(3, shift.getBegin().length));
-                shift.setReferenceDate(date);
-                begin = new Date(date);
-                date.setHours(shift.getEnd().substring(0, 2), shift.getEnd().substring(3, shift.getEnd().length));
-                end = new Date(date);
-            }
-        });
-        shift.setWeekday(weekDay);
-        dirty = true;
-        recalculcateBlacklists();
-    });
-
-
     let blacklists = resolveBlacklists(shift, begin);
     let blacklistMitarbeiter = blacklists[0];
     let blacklistCMs = blacklists[1];
@@ -341,35 +320,78 @@ function addShiftPopup(begin, end, shift, isEdit) {
         })));
     };
 
+    let mitarbeiter1Value = Object.entries(mitarbeiterById)
+        .filter(entry => {
+            return entry[1] == shift.getMitarbeiter()[0]?.resolveName()
+        })
+        .map(entry => entry[0]);
+
     let mitarbeiter1Dropdown = new Dropdown({
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
-    }).metaName("mitarbeiter").setValue(shift.getMitarbeiter()[0]).changeListener(() => {
+    }).metaName("mitarbeiter").setValue(mitarbeiter1Value).changeListener(() => {
         mitarbeiterValueChange(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
     });
+
+    let mitarbeiter2Value = Object.entries(mitarbeiterById)
+        .filter(entry => {
+            return entry[1] == shift.getMitarbeiter()[1]?.resolveName()
+        })
+        .map(entry => entry[0]);
 
     let mitarbeiter2Dropdown = new Dropdown({
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
-    }).metaName("mitarbeiter").setValue(shift.getMitarbeiter()[1]).changeListener(() => {
+    }).metaName("mitarbeiter").setValue(mitarbeiter2Value).changeListener(() => {
         mitarbeiterValueChange(mitarbeiter2Dropdown, mitarbeiter1Dropdown, mitarbeiter3Dropdown);
     });
+
+    let mitarbeiter3Value = Object.entries(mitarbeiterById)
+        .filter(entry => {
+            return entry[1] == shift.getMitarbeiter()[2]?.resolveName()
+        })
+        .map(entry => entry[0]);
 
     let mitarbeiter3Dropdown = new Dropdown({
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
-    }).metaName("mitarbeiter").setValue(shift.getMitarbeiter()[2]).changeListener(() => {
+    }).metaName("mitarbeiter").setValue(mitarbeiter3Value).changeListener(() => {
         mitarbeiterValueChange(mitarbeiter3Dropdown, mitarbeiter1Dropdown, mitarbeiter2Dropdown);
+    });
+
+    let wochentagDropdown = new Dropdown({
+        data: weekDaysById,
+        placeholder: "z.B. " + weekDaysById[Object.keys(weekDaysById)[0]]
+    }).metaName("wochentag").setValue(initialWeekday).changeListener((event, item) => {
+        let weekDay = Object.keys(item)[0];
+        let dates = resolveDateRange(from, till);
+        dates.forEach(date => {
+            if ((date.getDay() - 1) == weekDay) {
+                date.setHours(shift.getBegin().substring(0, 2), shift.getBegin().substring(3, shift.getBegin().length));
+                shift.setReferenceDate(date);
+                begin = new Date(date);
+                date.setHours(shift.getEnd().substring(0, 2), shift.getEnd().substring(3, shift.getEnd().length));
+                end = new Date(date);
+            }
+        });
+        shift.setWeekday(weekDay);
+        dirty = true;
+        recalculateBlacklists(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
     });
 
     let cmsById = {};
     cms.forEach(cm => cmsById[cm.getId()] = cm.getName());
     cmsById = Object.fromEntries(Object.entries(cmsById).filter(([key]) => !blacklistCMs.includes(key)));
 
+    let cmValue = Object.entries(cmsById)
+        .filter(entry => {
+            return entry[1] == shift.getCM()?.getName();
+        })
+        .map(entry => entry[0]);
     let cmDropdown = new Dropdown({
         data: cmsById,
         placeholder: "z.B. Kasse 1"
-    }).metaName("cm").setValue(shift.getCM()).changeListener((event, item) => {
+    }).metaName("cm").setValue(cmValue).changeListener((event, item) => {
         shift.setCM(Object.keys(item)[0]);
         dirty = true;
     });
@@ -398,7 +420,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
                                     shift.setBegin(value);
                                     begin.setHours(value.substring(0, 2), value.substring(3, value.length));
                                     dirty = true;
-                                    recalculcateBlacklists();
+                                    recalculateBlacklists(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
                                 }
                             })
                         )
@@ -415,7 +437,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
                                     shift.setEnd(value);
                                     end.setHours(value.substring(0, 2), value.substring(3, value.length));
                                     dirty = true;
-                                    recalculcateBlacklists();
+                                    recalculateBlacklists(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
                                 }
                             })
                         )
@@ -479,7 +501,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
     ).build());
 
     let firstTime = true;
-    function recalculcateBlacklists() {
+    function recalculateBlacklists(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown) {
         blacklists = resolveBlacklists(shift, begin);
         blacklistMitarbeiter = blacklists[0];
         blacklistCMs = blacklists[1];
@@ -488,7 +510,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
         mitarbeiter.forEach(arbeiter => mitarbeiterById[arbeiter.getId()] = arbeiter.resolveName());
         mitarbeiterById = Object.fromEntries(Object.entries(mitarbeiterById).filter(([key]) => !blacklistMitarbeiter.includes(key)));
         
-        cmsById = {};
+        let cmsById = {};
         cms.forEach(cm => cmsById[cm.getId()] = cm.getName());
         cmsById = Object.fromEntries(Object.entries(cmsById).filter(([key]) => !blacklistCMs.includes(key)));
 
