@@ -309,8 +309,9 @@ function addShiftPopup(begin, end, shift, isEdit) {
             .concatIfNotNull(mitarbeiter2Dropdown.getValue())
             .concatIfNotNull(mitarbeiter3Dropdown.getValue());
 
-        shift.setMitarbeiter(mitarbeiter);
+        console.log("mitarbeiterValueChange");
         dirty = true;
+        shift.setMitarbeiter(mitarbeiter);
 
         other1.setItems(Object.fromEntries(Object.entries(mitarbeiterById).filter(([key]) => {
             return key != current.getValue() && key != other2.getValue() && !blacklistMitarbeiter.includes(key);
@@ -331,7 +332,9 @@ function addShiftPopup(begin, end, shift, isEdit) {
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
     }).metaName("mitarbeiter").setValue(mitarbeiter1Value).changeListener(() => {
-        mitarbeiterValueChange(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
+        if(mitarbeiter1Dropdown.getValue() !== mitarbeiter1Value[0]){
+            mitarbeiterValueChange(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
+        }
     });
 
     let mitarbeiter2Value = getType(shift.getMitarbeiter()[1]) === 'object' 
@@ -346,7 +349,9 @@ function addShiftPopup(begin, end, shift, isEdit) {
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
     }).metaName("mitarbeiter").setValue(mitarbeiter2Value).changeListener(() => {
-        mitarbeiterValueChange(mitarbeiter2Dropdown, mitarbeiter1Dropdown, mitarbeiter3Dropdown);
+        if(mitarbeiter2Dropdown.getValue() !== mitarbeiter2Value[0]){
+            mitarbeiterValueChange(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
+        }
     });
 
     let mitarbeiter3Value = getType(shift.getMitarbeiter()[2]) === 'object' 
@@ -361,7 +366,9 @@ function addShiftPopup(begin, end, shift, isEdit) {
         data: mitarbeiterById,
         placeholder: "z.B. Max Mustermann"
     }).metaName("mitarbeiter").setValue(mitarbeiter3Value).changeListener(() => {
-        mitarbeiterValueChange(mitarbeiter3Dropdown, mitarbeiter1Dropdown, mitarbeiter2Dropdown);
+        if(mitarbeiter3Dropdown.getValue() !== mitarbeiter3Value[0]){
+            mitarbeiterValueChange(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
+        }
     });
 
     let wochentagDropdown = new Dropdown({
@@ -380,7 +387,10 @@ function addShiftPopup(begin, end, shift, isEdit) {
             }
         });
         shift.setWeekday(weekDay);
-        dirty = true;
+        if(initialWeekday != weekDay){
+            console.log("wochentagDropdown")
+            dirty = true;
+        }
         recalculateBlacklists(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
     });
 
@@ -399,8 +409,11 @@ function addShiftPopup(begin, end, shift, isEdit) {
         data: cmsById,
         placeholder: "z.B. Kasse 1"
     }).metaName("cm").setValue(cmValue).changeListener((event, item) => {
-        shift.setCM(Object.keys(item)[0]);
-        dirty = true;
+        if(cmDropdown.getValue() !== cmValue[0]){
+            shift.setCM(Object.keys(item)[0]);
+            console.log("cm");
+            dirty = true;
+        }
     });
 
     let parentTable = new ElementBuilder("table").cssClass("popup-table");
@@ -426,6 +439,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
                                 if (/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
                                     shift.setBegin(value);
                                     begin.setHours(value.substring(0, 2), value.substring(3, value.length));
+                                    console.log("begin");
                                     dirty = true;
                                     recalculateBlacklists(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
                                 }
@@ -443,6 +457,7 @@ function addShiftPopup(begin, end, shift, isEdit) {
                                 if (/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
                                     shift.setEnd(value);
                                     end.setHours(value.substring(0, 2), value.substring(3, value.length));
+                                    console.log("end");
                                     dirty = true;
                                     recalculateBlacklists(mitarbeiter1Dropdown, mitarbeiter2Dropdown, mitarbeiter3Dropdown);
                                 }
