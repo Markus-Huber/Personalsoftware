@@ -77,6 +77,7 @@ function showShift() {
             }
         },
         datesSet: (evt) => {
+            console.log(evt);
             from = new Date(evt.start);
             if (isEmpty(currentWeekFrom)) {
                 currentWeekFrom = new Date(from);
@@ -164,14 +165,17 @@ function buildCopyShiftsButton() {
 }
 
 function copyShifts(week, withEmployees) {
-    new xmlHttpRequestHelper("src/php/copyShifts.php",
+    new xmlHttpRequestHelper("./api/admin/shift/copy",
         "oldFrom=" + formatGermanDateToInternational(week[0]) + "&oldTill=" + formatGermanDateToInternational(week[1]) + "&withEmployees=" + withEmployees +
-        "&newFrom=" + formatDateGerman(from) + "&newTill=" + formatDateGerman(till),
+        "&newFrom=" + formatGermanDateToInternational(formatDateGerman(from)) + "&newTill=" + formatGermanDateToInternational(formatDateGerman(till)),
         true, true, () => {
             //refresh
-            calendar.next();
-            calendar.prev();
-            copyDropdown.setValue();
+            fromTills[formatGermanDateToInternational(formatDateGerman(from)) + formatGermanDateToInternational(formatDateGerman(till))] = false;
+            setTimeout(() => {
+                calendar.next();
+                calendar.prev();
+                copyDropdown.setValue();                    
+            }, 100);
         });
 }
 
@@ -660,6 +664,10 @@ function saveShift(shift, begin, end, isEdit) {
 function addEvent(shift, begin = new Date(shift.getReferenceDate() + "T" + shift.getBegin()), end = new Date(shift.getReferenceDate() + "T" + shift.getEnd())) {
     let mtbs = shift.getMitarbeiter().map(mitarbeiter => mitarbeiter.resolveName());
     let cm = shift.getCM();
+    let oldEvent = calendar.getEventById(shift.getId());
+    if(oldEvent){
+        oldEvent.remove();
+    }
     calendar.addEvent({
         id: shift.getId(),
         title: cm.getName() + " (" + shift.getBegin() + " - " + shift.getEnd() + ")<br />" + mtbs.join(", "),

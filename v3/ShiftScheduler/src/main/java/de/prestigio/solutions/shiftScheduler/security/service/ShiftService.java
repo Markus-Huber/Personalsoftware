@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,5 +78,25 @@ public class ShiftService {
 
     public void deleteShift(final Long shiftId){
         shiftRepository.deleteById(shiftId);
+    }
+
+    public void copyShifts(LocalDate oldFrom, LocalDate oldTill, LocalDate newFrom, LocalDate newTill, boolean withEmployees) {
+        Collection<Shift> shiftsBetween = shiftRepository.findShiftsBetween(oldFrom, oldTill);
+
+        long diffInDays = ChronoUnit.DAYS.between(oldFrom, newFrom);
+        List<Shift> newShifts = new ArrayList<>();
+        shiftsBetween.forEach(shift -> {
+            Shift newShift = new Shift();
+            newShift.setScheduledDate(shift.getScheduledDate().plusDays(diffInDays));
+            newShift.setBegin(shift.getBegin());
+            newShift.setEnd(shift.getEnd());
+            newShift.setDivision(shift.getDivision());
+            if(withEmployees){
+                newShift.setEmployees(shift.getEmployees().stream().map(Employee::getId).map(Employee::new).toList());
+            }
+            newShifts.add(newShift);
+        });
+
+        shiftRepository.saveAll(newShifts);
     }
 }

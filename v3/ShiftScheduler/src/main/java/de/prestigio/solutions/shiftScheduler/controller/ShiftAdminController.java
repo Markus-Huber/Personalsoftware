@@ -2,7 +2,6 @@ package de.prestigio.solutions.shiftScheduler.controller;
 
 import de.prestigio.solutions.shiftScheduler.entity.dto.SaveShiftDTO;
 import de.prestigio.solutions.shiftScheduler.entity.dto.ShiftDTO;
-import de.prestigio.solutions.shiftScheduler.entity.dto.TestDTO;
 import de.prestigio.solutions.shiftScheduler.security.config.RoleAdmin;
 import de.prestigio.solutions.shiftScheduler.security.service.ShiftService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +43,10 @@ public class ShiftAdminController {
     }
 
     @RoleAdmin
-    @PostMapping("test")
-    public void test(@RequestBody TestDTO testParam){
-        System.out.println(testParam);
+    @PostMapping("copy")
+    public void copyShifts(@RequestParam("oldFrom") String oldFrom, @RequestParam("oldTill") String oldTill,
+                           @RequestParam("newFrom") String newFrom, @RequestParam("newTill") String newTill,
+                           @RequestParam("withEmployees") boolean withEmployees){
+        shiftService.copyShifts(LocalDate.parse(oldFrom), LocalDate.parse(oldTill), LocalDate.parse(newFrom), LocalDate.parse(newTill), withEmployees);
     }
 }
